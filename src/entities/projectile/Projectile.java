@@ -10,24 +10,20 @@ import java.awt.*;
 
 public class Projectile extends Entity {
     private final Collider collider = new Collider(this);
+    public final Entity sender;
 
-    public Projectile(GameManager manager, Vector2 position, Vector2 velocity, float radius) {
+    public Projectile(GameManager manager, Vector2 position, Vector2 velocity, float radius, Entity sender) {
         super(manager);
         this.position = position;
         this.radius = radius;
         this.velocity = velocity;
+        this.sender = sender;
     }
 
     @Override
     public void Update(float deltaTime, long currentTime) {
-        super.Update(deltaTime, currentTime);
-    }
-
-    @Override
-    public void Render(float deltaTime, long currentTime) {
-        GameLib.setColor(Color.GREEN);
-        GameLib.drawLine(position.x, position.y - 5, position.x, position.y + 5);
-        GameLib.drawLine(position.x - 1, position.y - 3, position.x - 1, position.y + 3);
-        GameLib.drawLine(position.x + 1, position.y - 3, position.x + 1, position.y + 3);
+        angle += (float) (rotationVelocity * Math.cos(angle) * deltaTime);
+        position.x += (float) (velocity.x * deltaTime);
+        position.y -= (float) (velocity.y * deltaTime);
     }
 }

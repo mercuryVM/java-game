@@ -22,9 +22,7 @@ public class EnemyB extends Enemy {
 
         float previousY = position.y;
 
-        position.x += (float) (velocity.x * Math.cos(this.angle) * deltaTime);
-        position.y += (float) (velocity.y * Math.sin(this.angle) * deltaTime * (-1.0f));
-        this.angle += (float) (this.rotationVelocity * deltaTime);
+        super.Update(deltaTime, currentTime);
 
         double threshold = GameLib.HEIGHT * 0.30f;
 
@@ -54,23 +52,16 @@ public class EnemyB extends Enemy {
             };
 
             for (float v : angles) {
-                float randomOffset = ((float)Math.random() - 0.5f) * ((float)Math.PI / 6f); // -π/12 a π/12
-                float a = v + randomOffset;
+                double a = v + Math.random() * Math.PI/6 - Math.PI/12;
+                double vx = Math.cos(a) * 0.3;
+                double vy = Math.sin(a) * 0.3;
 
-                float vx = (float)Math.cos(a);
-                float vy = (float)Math.sin(a);
-
-                Vector2 direction = new Vector2(-vx * 0.3f, -vy * 0.3f);
-
-                Shoot(currentTime, direction);
+                Shoot(currentTime, new Vector2((float)vx, (float)-vy));
             }
         }
-
     }
 
     protected void Shoot(long currentTime, Vector2 direction) {
-        if(currentTime < nextShoot) return;
-
         AddProjectile(direction);
 
         nextShoot = currentTime + getShootInterval();
@@ -81,13 +72,16 @@ public class EnemyB extends Enemy {
                 this.position.copy(),
                 new Vector2(shootDirection.x, shootDirection.y),
                 2.0f,
-                ProjectileClass()
+                ProjectileClass(),
+                this
         );
     }
 
     @Override
-    public void Render(float deltaTime, long currentTime) {
+    public boolean Render(float deltaTime, long currentTime) {
+        if(super.Render(deltaTime, currentTime)) return true;
         GameLib.setColor(Color.RED);
         GameLib.drawCircle(position.x, position.y, radius);
+        return false;
     }
 }

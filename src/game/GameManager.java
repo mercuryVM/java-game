@@ -11,6 +11,9 @@ import entities.projectile.Projectile;
 import input.Input;
 import libraries.GameLib;
 import math.Vector2;
+import scene.Scene;
+import scene.config.GameConfig;
+import time.Time;
 
 import java.awt.*;
 import java.lang.reflect.Constructor;
@@ -26,8 +29,16 @@ public class GameManager {
     private final Input input;
     private final LinkedList<Entity> removalList = new LinkedList<Entity>();
     private final SpawnManager spawnManager = new SpawnManager(this);
+    private int currentScene = 0;
+    private final GameConfig gameConfig;
 
-    public GameManager() {
+    public Scene getCurrentScene() {
+        return gameConfig.sceneList.get(currentScene);
+    }
+
+    public GameManager(GameConfig gameConfig) {
+        this.gameConfig = gameConfig;
+
         backgrounds.add(
                 new Background(20, 0.070f, Color.DARK_GRAY, 2)
         );
@@ -69,7 +80,12 @@ public class GameManager {
     }
 
     public void Update(float deltaTime, long currentTime) {
+        Time.time = currentTime;
+        Time.deltaTime = deltaTime;
+
         input.Process(deltaTime, currentTime);
+
+        player.Update(deltaTime, currentTime);
 
         this.UpdateEntities(projectiles, deltaTime, currentTime);
 
@@ -88,6 +104,24 @@ public class GameManager {
         removalList.clear();
 
         spawnManager.Update(deltaTime, currentTime);
+
+        CollisionUpdate(deltaTime, currentTime);
+    }
+
+    private void CollisionUpdate(float deltaTime, long currentTime) {
+            for(var e1 : enemies) {
+                if(player.isActive() && player.collider.TestCollision(e1)) {
+                    player.setDead();
+                    break;
+                }
+            }
+
+            for(var p1 : projectiles) {
+                if(player.isActive() && player.collider.TestCollision(p1) && p1.sender != player) {
+                    player.setDead();
+                    break;
+                }
+            }
     }
 
     public void Render(float deltaTime, long currentTime) {
@@ -140,15 +174,17 @@ public class GameManager {
         enemies.add(enemy);
     }
 
-    public void AddProjectile(Vector2 position, Vector2 velocity, float radius, Class<? extends Projectile> projectileClass) {
+    public void AddProjectile(Vector2 position, Vector2 velocity, float radius, Class<? extends Projectile> projectileClass, Entity sender) {
         try {
             Constructor<? extends Projectile> constructor = projectileClass.getConstructor(
-                    GameManager.class, Vector2.class, Vector2.class, float.class
+                    GameManager.class, Vector2.class, Vector2.class, float.class, Entity.class
             );
 
             Projectile projectile = constructor.newInstance(
-                    this, position, velocity, radius
+                    this, position, velocity, radius, sender
             );
+
+           // projectile.angle = -(3f * (float)Math.PI) / 2f;
 
             projectiles.add(projectile);
         } catch (Exception e) {

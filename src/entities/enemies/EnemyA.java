@@ -12,15 +12,19 @@ public class EnemyA extends Enemy {
 
     @Override
     public void Update(float deltaTime, long currentTime) {
-        position.x += (float) (velocity.x * Math.cos(this.angle) * deltaTime);
-        position.y += (float) (velocity.y * Math.sin(this.angle) * deltaTime * (-1.0));
-        this.angle += (float) (this.rotationVelocity * deltaTime);
-        Shoot(currentTime);
+        super.Update(deltaTime, currentTime);
+        //Verificar se pode atirar
+        if(currentTime >= nextShoot) {
+            Shoot(currentTime);
+        }
     }
 
     @Override
-    public void Render(float deltaTime, long currentTime) {
+    public boolean Render(float deltaTime, long currentTime) {
+        if(super.Render(deltaTime, currentTime)) return true;
         GameLib.setColor(Color.CYAN);
         GameLib.drawCircle(position.x, position.y, radius);
+
+        return false;
     }
 }

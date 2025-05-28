@@ -15,11 +15,6 @@ public class Enemy extends ShooterEntity {
     @Override
     public void Update(float deltaTime, long currentTime) {
         super.Update(deltaTime, currentTime);
-
-        //Verificar se pode atirar
-        if(currentTime >= nextShoot) {
-            Shoot(currentTime);
-        }
     }
 
     public boolean OutOfBounds() {
@@ -34,7 +29,8 @@ public class Enemy extends ShooterEntity {
                 this.position.copy(),
                 new Vector2(0.0f, -0.45f),
                 2.0f,
-                ProjectileClass()
+                ProjectileClass(),
+                this
         );
     }
 
