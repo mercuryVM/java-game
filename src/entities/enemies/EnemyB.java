@@ -24,6 +24,8 @@ public class EnemyB extends Enemy {
 
         super.Update(deltaTime, currentTime);
 
+        if(!isActive()) return;
+
         double threshold = GameLib.HEIGHT * 0.30f;
 
         if(previousY < threshold && position.y >= threshold) {

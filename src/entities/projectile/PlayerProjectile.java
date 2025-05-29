@@ -10,6 +10,7 @@ import java.awt.*;
 public class PlayerProjectile extends Projectile {
     public PlayerProjectile(GameManager manager, Vector2 position, Vector2 velocity, float radius, Entity sender) {
         super(manager, position, velocity, radius, sender);
+        this.radius = 12;
     }
 
     @Override

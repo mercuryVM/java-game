@@ -17,7 +17,7 @@ public class SpawnManager {
     public void Update(float deltaTime, long currentTime) {
         if(currentTime > nextEnemy1) {
             gameManager.SpawnEnemyA();
-            nextEnemy1 = currentTime + 500;
+            nextEnemy1 = currentTime + 300 + (long)(Math.random() * 200);
         }
 
         if(currentTime > nextEnemy2) {

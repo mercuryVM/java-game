@@ -24,6 +24,11 @@ public class Enemy extends ShooterEntity {
     }
 
     @Override
+    protected void Respawn() {
+        gameManager.RemoveEnemy(this);
+    }
+
+    @Override
     protected void AddProjectile() {
         gameManager.AddProjectile(
                 this.position.copy(),

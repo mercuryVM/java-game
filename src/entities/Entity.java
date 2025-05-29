@@ -32,13 +32,19 @@ public class Entity {
     private long deadStart = 0, deadEnd = 0;
 
     public void Update(float deltaTime, long currentTime) {
-        angle += (float) (rotationVelocity * deltaTime);
-        position.x += (float) (velocity.x * Math.cos(angle) * deltaTime);
-        position.y -= (float) (velocity.y * Math.sin(angle) * deltaTime);
+        if(state == State.ACTIVE) {
+            angle += (float) (rotationVelocity * deltaTime);
+            position.x += (float) (velocity.x * Math.cos(angle) * deltaTime);
+            position.y -= (float) (velocity.y * Math.sin(angle) * deltaTime);
+        }
 
         if(state == State.EXPLODING && isNotDead()) {
-            setActive();
+            Respawn();
         }
+    }
+
+    protected void Respawn() {
+        setActive();
     }
 
     public boolean OutOfBounds() {

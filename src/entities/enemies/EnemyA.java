@@ -14,7 +14,7 @@ public class EnemyA extends Enemy {
     public void Update(float deltaTime, long currentTime) {
         super.Update(deltaTime, currentTime);
         //Verificar se pode atirar
-        if(currentTime >= nextShoot) {
+        if(isActive() && currentTime >= nextShoot) {
             Shoot(currentTime);
         }
     }
