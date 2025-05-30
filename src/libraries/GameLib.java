@@ -102,6 +102,10 @@ public class GameLib {
 		
 		g.drawOval(x, y, width, height);
 	}
+
+	public static void drawString(double x, double y, String text) {
+		g.drawString(text, (int)x, (int)y);
+	}
 	
 	public static void drawDiamond(double x, double y, double radius){
 		

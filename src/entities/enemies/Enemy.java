@@ -32,7 +32,7 @@ public class Enemy extends ShooterEntity {
     protected void AddProjectile() {
         gameManager.AddProjectile(
                 this.position.copy(),
-                new Vector2(0.0f, -0.45f),
+                new Vector2((float)(Math.random() - 0.5f) * 0.05f, -0.45f),
                 2.0f,
                 ProjectileClass(),
                 this

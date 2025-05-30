@@ -2,6 +2,7 @@ import game.GameManager;
 import libraries.GameLib;
 import org.xml.sax.SAXException;
 import scene.config.GameConfig;
+import time.Time;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.Color;
@@ -35,6 +36,8 @@ public class Main {
 			gameManager = new GameManager(
 					gameConfig
 			);
+
+			Time.timeStartup = System.currentTimeMillis();
 
 			//Inicializa o GameLoop
 			GameLoop();

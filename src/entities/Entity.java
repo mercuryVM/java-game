@@ -10,6 +10,7 @@ import java.awt.*;
 
 public class Entity {
     protected final GameManager gameManager;
+    protected float currentHealth = 1.0f;
 
     public Entity(GameManager manager) {
         this.gameManager = manager;
@@ -18,7 +19,8 @@ public class Entity {
     public enum State {
         INACTIVE,
         ACTIVE,
-        EXPLODING
+        EXPLODING,
+        INVINCIBLE
     }
 
     public Vector2 position = new Vector2();
@@ -30,6 +32,10 @@ public class Entity {
     public Collider collider = new Collider(this);
 
     private long deadStart = 0, deadEnd = 0;
+
+    public float getCurrentHealth() {
+        return currentHealth;
+    }
 
     public void Update(float deltaTime, long currentTime) {
         if(state == State.ACTIVE) {
@@ -47,6 +53,19 @@ public class Entity {
         setActive();
     }
 
+    public boolean ApplyDamage(float damage) {
+        if(state == State.INVINCIBLE) return false;
+
+        damage = Math.abs(damage);
+        if(this.currentHealth - damage <= 0) {
+            this.currentHealth = 0f;
+            this.setDead();
+        }else {
+            this.currentHealth -= damage;
+        }
+        return true;
+    }
+
     public boolean OutOfBounds() {
         return position.y > GameLib.HEIGHT || position.y <= 0;
     }
@@ -54,10 +73,12 @@ public class Entity {
     public boolean Render(float deltaTime, long currentTime) {
         if(state == State.EXPLODING && currentTime < deadEnd) {
             double alpha = (double) (currentTime - deadStart) / (deadEnd - deadStart);
-            GameLib.drawExplosion(position.x, position.y, alpha);
+            if(alpha >= 0 && alpha <= 1)
+                GameLib.drawExplosion(position.x, position.y, alpha);
             return true;
         }
-        return false;
+
+        return state == State.INACTIVE;
     }
 
     public void Dispose() {
@@ -65,7 +86,7 @@ public class Entity {
     }
 
     public boolean isActive() {
-        return state == State.ACTIVE;
+        return state == State.ACTIVE || state == State.INVINCIBLE;
     }
 
     public void setActive() {
