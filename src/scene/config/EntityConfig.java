@@ -1,7 +1,5 @@
 package scene.config;
 
-import math.Vector2;
-
 public class EntityConfig {
     private int entityType;
     private int entitySpawnInterval;
@@ -13,5 +11,18 @@ public class EntityConfig {
         this.entitySpawnInterval = i;
         this.positionX = x;
         this.positionY = y;
+    }
+
+    public int getType(){
+        return entityType;
+    }
+    public int getInterval(){
+        return entitySpawnInterval;
+    }
+    public float getPositionX(){
+        return positionX;
+    }
+    public float getPositionY(){
+        return positionY;
     }
 }

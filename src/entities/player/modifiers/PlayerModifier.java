@@ -1,7 +1,6 @@
 package entities.player.modifiers;
 
 import entities.player.Player;
-import time.Time;
 
 import java.awt.*;
 

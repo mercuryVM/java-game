@@ -6,8 +6,6 @@ import libraries.GameLib;
 import math.Vector2;
 import time.Time;
 
-import java.awt.*;
-
 public class Entity {
     protected final GameManager gameManager;
     protected float currentHealth = 1.0f;

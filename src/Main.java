@@ -5,7 +5,6 @@ import scene.config.GameConfig;
 import time.Time;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 

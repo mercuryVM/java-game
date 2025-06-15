@@ -6,7 +6,6 @@ import entities.player.modifiers.ModifierList;
 import entities.player.modifiers.entry.PlayerModifierEntry;
 import entities.projectile.PlayerProjectile;
 import entities.projectile.Projectile;
-import game.EntityList;
 import game.GameManager;
 import libraries.GameLib;
 import math.Vector2;
