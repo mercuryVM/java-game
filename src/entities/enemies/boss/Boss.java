@@ -3,25 +3,21 @@ package entities.enemies.boss;
 import entities.enemies.Enemy;
 import game.GameManager;
 import libraries.GameLib;
+import math.Vector2;
 import time.Time;
 
 import java.awt.*;
 
 public class Boss extends Enemy {
-    public Boss(GameManager manager) {
+
+    public Boss(GameManager manager, int health) {
         super(manager);
-        this.currentHealth = 1000;
+        this.currentHealth = health;
     }
 
     @Override
-    public boolean Render(float deltaTime, long currentTime) {
-        if(super.Render(deltaTime, currentTime)) return true;
-        GameLib.setColor(Color.CYAN);
-        float time = Time.getTimeFromStart() / 1000f;
-        double radius = Math.abs(Math.cos(time) * 20) + 30;
-        GameLib.drawCircle(position.x, position.y, radius);
-        GameLib.setColor(Color.gray);
-        GameLib.drawLine(position.x, position.y, position.x * Math.cos(time), position.y * Math.sin(time));
+    public boolean OutOfBounds() {
         return false;
     }
+
 }
