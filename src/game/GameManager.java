@@ -18,10 +18,19 @@ import scene.config.GameConfig;
 import time.Time;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class GameManager {
     public final Player player;
@@ -32,8 +41,9 @@ public class GameManager {
     private final Input input;
     private final SpawnManager spawnManager = new SpawnManager(this);
     private int currentScene = 0;
-    private final GameConfig gameConfig;
     private int currentScore = 0;
+    private final GameConfig gameConfig;
+    private ArrayList<Scene> scenes = new ArrayList<Scene>();
 
     public int getCurrentScore() {
         return currentScore;
@@ -45,6 +55,21 @@ public class GameManager {
 
     public float getCurrentHealth() {
         return player.getCurrentHealth();
+    }
+
+    public void LoadScenes() throws IOException, SAXException, ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(new File("gameConfig.xml"));
+
+        var first = document.getDocumentElement();
+        String phasesTag = first.getElementsByTagName("numberOfPhases").item(0).getTextContent();
+        int numberOfPhases = Integer.parseInt(phasesTag);
+
+        for(int i = 1; i <= numberOfPhases; i++){
+            Scene scene = new Scene("Scene" + i + "Config.xml");
+            scenes.add(scene);
+        }
     }
 
     public GameManager(GameConfig gameConfig) {
@@ -59,6 +84,12 @@ public class GameManager {
         player.setActive();
         player.velocity = new Vector2(0.25f, 0.25f);
         player.SetSpawn();
+        try{
+            LoadScenes();
+        }
+        catch(Exception e){
+            return;
+        }
     }
 
     public void OnEnemy2Dispsoed() {
@@ -200,7 +231,6 @@ public class GameManager {
 
         enemies.add(enemy);
     }
-
 
     public void AddProjectile(Vector2 position, Vector2 velocity, float radius, Class<? extends Projectile> projectileClass, Entity sender) {
         try {

@@ -1,3 +1,6 @@
-<game playerHealth="100.0f">
-
+<game>
+    <playerHealth>100.0f</playerHealth>
+    <numberOfPhases>2</numberOfPhases>
+    <phaseOneConfig>PhaseOneConfig.xml</phaseOneConfig>
+    <phaseTwoConfig>PhaseTwoConfig.xml</phaseTwoConfig>
 </game>

@@ -28,9 +28,9 @@ public class GameConfig {
 
         var gameElement = document.getDocumentElement();
 
-        float playerHealth = Float.parseFloat(
-                gameElement.getAttribute("playerHealth")
-        );
+        String healthTag = gameElement.getElementsByTagName("playerHealth").item(0).getTextContent();
+
+        float playerHealth = Float.parseFloat(healthTag);
 
         var gameConfig = new GameConfig(playerHealth);
 
