@@ -18,17 +18,13 @@ import scene.config.GameConfig;
 import time.Time;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class GameManager {
@@ -37,39 +33,12 @@ public class GameManager {
     public final EntityList<Projectile> projectiles = new EntityList<>();
     public final EntityList<Powerup> powerups = new EntityList<>();
     public final List<Background> backgrounds = new ArrayList<>();
+    public int currentGameMode;     // 0 = fases; 1 = infinito
     private final Input input;
-    private final SpawnManager spawnManager = new SpawnManager(this);
-    private int currentScene = 0;
-    private int currentScore = 0;
+    private final SpawnManager spawnManager;
     private final GameConfig gameConfig;
-    private ArrayList<Scene> scenes = new ArrayList<Scene>();
-
-    public int getCurrentScore() {
-        return currentScore;
-    }
-
-    public Scene getCurrentScene() {
-        return gameConfig.sceneList.get(currentScene);
-    }
-
-    public float getCurrentHealth() {
-        return player.getCurrentHealth();
-    }
-
-    public void LoadScenes() throws IOException, SAXException, ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(new File("gameConfig.xml"));
-
-        var first = document.getDocumentElement();
-        String phasesTag = first.getElementsByTagName("numberOfPhases").item(0).getTextContent();
-        int numberOfPhases = Integer.parseInt(phasesTag);
-
-        for(int i = 1; i <= numberOfPhases; i++){
-            Scene scene = new Scene("Scene" + i + "Config.xml");
-            scenes.add(scene);
-        }
-    }
+    private Scene currentScene = null;
+    private int currentScore = 0;
 
     public GameManager(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
@@ -79,25 +48,73 @@ public class GameManager {
         backgrounds.add(new Background(100, 0.025f, new Color(0.1f, 0, 0.3f), 2));
 
         player = new Player(this, gameConfig.playerHealth);
-        input = new Input(player);
         player.setActive();
         player.velocity = new Vector2(0.25f, 0.25f);
         player.SetSpawn();
+        this.currentGameMode = 0;
+        
+        input = new Input(player);
+
+        spawnManager = new SpawnManager(this);
+    }
+
+    public void LoadScene(int newSceneIndex, long currentTime){
         try{
-            LoadScenes();
+            if(newSceneIndex >= 0){         // com cena dos configs (modo de jogo levels)
+                String newScenePath = gameConfig.sceneConfigs.get(newSceneIndex);
+                Scene scene = new Scene(newScenePath, currentTime, newSceneIndex);
+                this.currentScene = scene;
+            }
+            if(newSceneIndex == -1){        // com cena padrão (modo de jogo infinito)
+                Scene scene = new Scene();
+                this.currentScene = scene;
+            }
         }
-        catch(Exception e){
+        catch(IOException | SAXException | ParserConfigurationException e){
+            System.out.println(e.getMessage());
             return;
         }
+    }
+
+    public int getCurrentScore() {
+        return this.currentScore;
+    }
+
+    public Scene getCurrentScene() {
+        return this.currentScene;
+    }
+
+    public float getCurrentHealth() {
+        return player.getCurrentHealth();
     }
 
     public void OnEnemy2Dispsoed() {
         spawnManager.OnEnemy2Disposed();
     }
 
+    private void UpdateSceneAndGameMode(){
+        if(this.currentScene == null && this.currentGameMode == 0){     // se for modo de níveis, e a cena ainda nao foi carregada, carrega a primeira
+            LoadScene(0, Time.time);
+            spawnManager.prepareEnemiesSpawns();
+            System.out.println("começando primeira fase");
+        }
+        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 < gameConfig.numberOfScenes){    // se o boss morreu e ainda nao acabaram as cenas, carrega a proxima
+            LoadScene(currentScene.getIndex()+1, Time.time);
+            spawnManager.prepareEnemiesSpawns();
+            System.out.println("começando proxima fase");
+        }
+        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 >= gameConfig.numberOfScenes){       // se o boss morreu e acabaram as cenas, muda pro modo infinito
+            LoadScene(-1, Time.time);
+            this.currentGameMode = 1;
+            System.out.println("modo de jogo alterado para infinito");
+        }
+    }
+
     public void Update(float deltaTime, long currentTime) {
         Time.time = currentTime;
         Time.deltaTime = deltaTime;
+
+        UpdateSceneAndGameMode();
 
         input.Process(deltaTime, currentTime);
         player.Update(deltaTime, currentTime);
@@ -113,9 +130,8 @@ public class GameManager {
     private void CollisionUpdate(float deltaTime, long currentTime) {
         for (var enemy : enemies.getEntities()) {
             if (player.isActive() && player.collider.TestCollision(enemy)) {
-                if(player.ApplyDamage(
-                        (float)Math.random() * 50.0f
-                )) {
+                if (player.ApplyDamage(
+                        (float) Math.random() * 50.0f)) {
                     ui.ApplyDamage();
                 }
 
@@ -134,9 +150,8 @@ public class GameManager {
 
         for (var projectile : projectiles.getEntities()) {
             if (player.isActive() && player.collider.TestCollision(projectile) && projectile.sender != player) {
-                if(player.ApplyDamage(
-                        (float)Math.random() * 50.0f
-                )) {
+                if (player.ApplyDamage(
+                        (float) Math.random() * 50.0f)) {
                     ui.ApplyDamage();
                 }
                 projectiles.scheduleRemoval(projectile);
@@ -209,7 +224,7 @@ public class GameManager {
     }
 
     public void HandlePlayerDeath() {
-        if(playerLives == 0) {
+        if (playerLives == 0) {
             player.setInactive();
             ui.GameOver();
             spawnManager.GameOver();
@@ -223,7 +238,7 @@ public class GameManager {
     public void SpawnBoss() {
         var enemy = new Boss(this);
         enemy.position = new Vector2(GameLib.WIDTH / 2f, GameLib.HEIGHT / 2f);
-        //enemy.velocity = new Vector2(0.42f, 0.42f);
+        // enemy.velocity = new Vector2(0.42f, 0.42f);
         enemy.angle = (3f * (float) Math.PI) / 2f;
         enemy.rotationVelocity = 0.0f;
         enemy.setActive();
@@ -231,11 +246,11 @@ public class GameManager {
         enemies.add(enemy);
     }
 
-    public void AddProjectile(Vector2 position, Vector2 velocity, float radius, Class<? extends Projectile> projectileClass, Entity sender) {
+    public void AddProjectile(Vector2 position, Vector2 velocity, float radius,
+            Class<? extends Projectile> projectileClass, Entity sender) {
         try {
             Constructor<? extends Projectile> constructor = projectileClass.getConstructor(
-                    GameManager.class, Vector2.class, Vector2.class, float.class, Entity.class
-            );
+                    GameManager.class, Vector2.class, Vector2.class, float.class, Entity.class);
 
             Projectile projectile = constructor.newInstance(this, position, velocity, radius, sender);
             projectiles.add(projectile);

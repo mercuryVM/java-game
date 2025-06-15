@@ -18,7 +18,6 @@ public class DamageIndicator {
             float progress = (float)(damageEnd - Time.time) / (damageEnd - damageStart);
 
             GameLib.setColor(new Color(1, 0, 0, (progress) * 0.5f));
-            System.out.println(progress);
 
             GameLib.fillRect(
                     0,

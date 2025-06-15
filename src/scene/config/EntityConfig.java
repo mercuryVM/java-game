@@ -2,11 +2,11 @@ package scene.config;
 
 public class EntityConfig {
     private int entityType;
-    private int entitySpawnInterval;
+    private long entitySpawnInterval;
     private float positionX;
     private float positionY;
 
-    public EntityConfig(int t, int i, float x, float y){
+    public EntityConfig(int t, long i, float x, float y){
         this.entityType = t;
         this.entitySpawnInterval = i;
         this.positionX = x;
@@ -16,7 +16,7 @@ public class EntityConfig {
     public int getType(){
         return entityType;
     }
-    public int getInterval(){
+    public long getInterval(){
         return entitySpawnInterval;
     }
     public float getPositionX(){
@@ -24,5 +24,11 @@ public class EntityConfig {
     }
     public float getPositionY(){
         return positionY;
+    }
+
+    public void updateSpawnInterval(long increase){
+        if(increase >= 0){
+            entitySpawnInterval = increase;
+        }
     }
 }

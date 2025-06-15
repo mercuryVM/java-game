@@ -1,6 +1,12 @@
 <game>
-    <playerHealth>100.0f</playerHealth>
-    <numberOfPhases>2</numberOfPhases>
-    <phaseOneConfig>PhaseOneConfig.xml</phaseOneConfig>
-    <phaseTwoConfig>PhaseTwoConfig.xml</phaseTwoConfig>
+    <playerHealth>100.0</playerHealth>
+    <numberOfScenes>2</numberOfScenes>
+    <scenes>
+        <sceneConfig>Scene1Config.xml</sceneConfig>
+        <sceneConfig>Scene2Config.xml</sceneConfig>
+    </scenes>
+    <modes>
+        <mode>Scenes</mode>
+        <mode>Infinite</mode>
+    </modes>
 </game>

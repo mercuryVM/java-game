@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 public class Scene {
-    ArrayList<EntityConfig> enemiesConfig = new ArrayList<EntityConfig>();
+    private ArrayList<EntityConfig> enemiesConfig = new ArrayList<EntityConfig>();
     Color primaryColor;
     Color secundaryColor;
     Color tertiaryColor;
+    long initialTime;
+    int currentSceneIndex;
 
     private static Color getColorByName(String colorName) {
         try {
@@ -33,7 +35,7 @@ public class Scene {
         }
     }
 
-    public Scene(String file) throws IOException, SAXException, ParserConfigurationException {
+    public Scene(String file, long currentTime, int currentSceneIndex) throws IOException, SAXException, ParserConfigurationException {
         File xmlFile = new File(file);          // "PhaseOneConfig.xml"
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -45,9 +47,19 @@ public class Scene {
         String sc = doc.getElementsByTagName("SecundaryBackgroundColor").item(0).getTextContent();
         String tc = doc.getElementsByTagName("TertiaryBackgroundColor").item(0).getTextContent();
 
-        this.primaryColor = getColorByName(pc);
-        this.secundaryColor = getColorByName(sc);
-        this.tertiaryColor = getColorByName(tc);
+        if(!pc.isEmpty())
+            this.primaryColor = getColorByName(pc);
+        else
+            this.primaryColor = Color.gray;
+        if(!sc.isEmpty())
+            this.secundaryColor = getColorByName(sc);
+        else
+            this.secundaryColor = Color.black;
+        if(!tc.isEmpty())
+            this.secundaryColor = getColorByName(tc);
+
+        this.initialTime = currentTime;
+        this.currentSceneIndex = currentSceneIndex;
 
         for (int i = 0; i < enemyNodes.getLength(); i++) {
             Node node = enemyNodes.item(i);
@@ -55,14 +67,68 @@ public class Scene {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element e = (Element) node;
 
-                int type = Integer.parseInt(e.getElementsByTagName("Type").item(0).getTextContent());
-                int interval = Integer.parseInt(e.getElementsByTagName("Type").item(0).getTextContent());
-                float posX = Float.parseFloat(e.getElementsByTagName("Type").item(0).getTextContent());
-                float posY = Float.parseFloat(e.getElementsByTagName("Type").item(0).getTextContent());
-
-                EntityConfig enemy = new EntityConfig(type, interval, posX, posY);
+                String type = e.getElementsByTagName("Type").item(0).getTextContent();
+                String interval = (e.getElementsByTagName("SpawnInterval").item(0).getTextContent());
+                String posX = e.getElementsByTagName("PositionX").item(0).getTextContent();
+                String posY = e.getElementsByTagName("PositionY").item(0).getTextContent();
+                
+                if(type.isEmpty())
+                    type = "1";
+                if(interval.isEmpty())
+                    interval = "1000";
+                if(posX.isEmpty())
+                    posX = "0.50";
+                if(posY.isEmpty())
+                    posY = "-10.0";
+                
+                EntityConfig enemy = new EntityConfig
+                (
+                    Integer.parseInt(type), 
+                    (currentTime + Long.parseLong(interval)), 
+                    Float.parseFloat(posX), 
+                    Float.parseFloat(posY)
+                );
                 enemiesConfig.add(enemy);
             }
         }
+    }
+
+    public Scene(){     // instancia sem parametro caso jogo esteja no modo infinito
+        this.primaryColor = Color.GRAY;
+        this.secundaryColor = Color.BLACK;
+        this.tertiaryColor = null;
+        this.currentSceneIndex = -1;
+        this.enemiesConfig = null;
+    }
+
+    public EntityConfig getNextEnemyInterval(int type){
+        int tamanho = this.enemiesConfig.size();
+        if(tamanho > 0){
+            for(int i = 0; i < tamanho; i++){      // roda as entidades da cena e procura o primeiro intervalo de spawn de um tipo de inimigo
+                EntityConfig e = enemiesConfig.get(i);
+                if (e.getType() == type){
+                    return e;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public int getIndex(){
+        return currentSceneIndex;
+    }
+
+    public void removeRecentlySpawnedEnemy(EntityConfig e){
+        if(e != null){
+            this.enemiesConfig.remove(e);
+        }
+    }
+
+    public boolean SceneIsDone(){
+        if(this.enemiesConfig != null)
+            return this.enemiesConfig.isEmpty();
+        else 
+            return true;
     }
 }

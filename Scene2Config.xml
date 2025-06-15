@@ -2,70 +2,70 @@
     <Enemies>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
         <Enemy>
             <Type></Type>
-            <When></When>
+            <SpawnInterval></SpawnInterval>
             <PositionX></PositionX>
             <PositionY></PositionY>
         </Enemy>
-
-        <Enemy>
-            <Type></Type>
-            <BossHealth></BossHealth>
-            <When></When>
-            <PositionX></PositionX>
-            <PositionY></PositionY>
-        </Enemy>
+        <!-- <Enemy>
+            <Type>3</Type>
+            <BossHealth>100</BossHealth>
+            <SpawnInterval>15000</SpawnInterval>
+            <PositionX>0.50</PositionX>
+            <PositionY>-10.0</PositionY>
+        </Enemy> -->
     </Enemies>
-    
+
     <Config>
-        <BackgroundColor></BackgroundColor>
-        <StarsColor></StarsColor>
+        <PrimaryBackgroundColor>BLUE</PrimaryBackgroundColor>
+        <SecundaryBackgroundColor>BLUE</SecundaryBackgroundColor>
+        <TertiaryBackgroundColor>BLUE</TertiaryBackgroundColor>
     </Config>
 </Phase>
