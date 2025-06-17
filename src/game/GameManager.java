@@ -98,7 +98,7 @@ public class GameManager {
             spawnManager.prepareEnemiesSpawns();
             System.out.println("começando primeira fase");
         }
-        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 < gameConfig.numberOfScenes){    // se o boss morreu e ainda nao acabaram as cenas, carrega a proxima
+        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 < gameConfig.numberOfScenes && currentScene.getIndex() != -1){    // se o boss morreu e ainda nao acabaram as cenas, carrega a proxima
             LoadScene(currentScene.getIndex()+1, Time.time);
             spawnManager.prepareEnemiesSpawns();
             System.out.println("começando proxima fase");
@@ -195,9 +195,31 @@ public class GameManager {
         enemies.add(enemy);
     }
 
+    public void SpawnEnemyA(float posX, float posY) {       // overload pra modo fase com posição inicial pré-demilimitada
+        var enemy = new EnemyA(this);
+        enemy.setActive();
+        enemy.position = new Vector2(posX, posY);
+        enemy.velocity = new Vector2(0.20f + (float) Math.random() * 0.15f, 0.20f + (float) Math.random() * 0.15f);
+        enemy.angle = (3f * (float) Math.PI) / 2f;
+        enemy.rotationVelocity = 0.0f;
+
+        enemies.add(enemy);
+    }
+
     public void SpawnEnemyB() {
         var enemy = new EnemyB(this);
         enemy.position = new Vector2((float) (GameLib.WIDTH * 0.20), -10.0f);
+        enemy.velocity = new Vector2(0.42f, 0.42f);
+        enemy.angle = (3f * (float) Math.PI) / 2f;
+        enemy.rotationVelocity = 0.0f;
+        enemy.setActive();
+
+        enemies.add(enemy);
+    }
+
+    public void SpawnEnemyB(float posX, float posY) {       // overload pra modo fase com posição inicial pré-demilimitada
+        var enemy = new EnemyB(this);
+        enemy.position = new Vector2(posX, posY);
         enemy.velocity = new Vector2(0.42f, 0.42f);
         enemy.angle = (3f * (float) Math.PI) / 2f;
         enemy.rotationVelocity = 0.0f;

@@ -49,7 +49,7 @@ public class SpawnManager {
         if(this.gameManager.currentGameMode == 0){      // se o gameMode for fase usa os spawns de inimigos de fase
             if(nextEnemy1 != null){
                 if(currentTime > nextEnemy1.getInterval()) {
-                    gameManager.SpawnEnemyA();
+                    gameManager.SpawnEnemyA(nextEnemy1.getPositionX(), nextEnemy1.getPositionY());
                     this.currentScene.removeRecentlySpawnedEnemy(nextEnemy1);        // tira o inimigo tipo 1 que spawnou da lista
                     nextEnemy1 = this.currentScene.getNextEnemyInterval(1);    // pega o prox inimigo tipo 1
                 }
@@ -59,15 +59,18 @@ public class SpawnManager {
                 if(currentTime > nextEnemy2.getInterval()) {
                     // o inimigo tipo 2 por padrão spawna 10, entao em SceneConfig.xml um inimigo tipo 2 indica 10 spawns desse inimigo
                     
-                    gameManager.SpawnEnemyB();
-                    enemy2Count++;
-    
                     if(enemy2Count <= 10) {
                         nextEnemy2.updateSpawnInterval(currentTime + 120);      // se nao deu 10 inimigos ainda, continua spawnando
                     } else {
                         this.currentScene.removeRecentlySpawnedEnemy(nextEnemy2);        // tira o inimigo tipo 2 que spawnou da lista
                         nextEnemy2 = this.currentScene.getNextEnemyInterval(2);     // se deu 10, pega o proximo tipo 2 do config
                     }
+
+                    if(nextEnemy2 != null){
+                        gameManager.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
+                        enemy2Count++;
+                    }
+    
                 }
             }
         }

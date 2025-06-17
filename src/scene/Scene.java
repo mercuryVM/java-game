@@ -71,13 +71,13 @@ public class Scene {
                 String interval = (e.getElementsByTagName("SpawnInterval").item(0).getTextContent());
                 String posX = e.getElementsByTagName("PositionX").item(0).getTextContent();
                 String posY = e.getElementsByTagName("PositionY").item(0).getTextContent();
-                
+                    
                 if(type.isEmpty())
                     type = "1";
                 if(interval.isEmpty())
                     interval = "1000";
                 if(posX.isEmpty())
-                    posX = "0.50";
+                    posX = "250.0";
                 if(posY.isEmpty())
                     posY = "-10.0";
                 
