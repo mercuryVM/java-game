@@ -83,6 +83,35 @@
         </Enemy> -->
     </Enemies>
 
+    <PowerUps>
+        <PowerUp>
+            <Modifiers>
+                <Modifier>DoubleTap</Modifier>
+            </Modifiers>
+            <SpawnInterval>5000</SpawnInterval>
+            <PositionX>560</PositionX>
+            <PositionY>-10.0</PositionY>
+        </PowerUp>
+        <PowerUp>
+            <Modifiers>
+                <Modifier>HealthAdd</Modifier>
+                <Modifier>DoubleTap</Modifier>
+            </Modifiers>
+            <SpawnInterval>10000</SpawnInterval>
+            <PositionX>95</PositionX>
+            <PositionY>-10.0</PositionY>
+        </PowerUp>
+        <PowerUp>
+            <Modifiers>
+                <Modifier>Invincible</Modifier>
+                <Modifier>DoubleTap</Modifier>
+            </Modifiers>
+            <SpawnInterval>15000</SpawnInterval>
+            <PositionX>435</PositionX>
+            <PositionY>-10.0</PositionY>
+        </PowerUp>
+    </PowerUps>
+    
     <Backgrounds>
         <Background>
             <Color>
