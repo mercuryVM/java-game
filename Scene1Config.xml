@@ -1,6 +1,20 @@
 <Phase>
     <Enemies>
         <Enemy>
+            <Type>2</Type>
+            <SpawnInterval>3000</SpawnInterval>
+            <PositionX>100</PositionX>
+            <PositionY>-10.0</PositionY>
+            <Amount>10</Amount>
+        </Enemy>
+        <Enemy>
+            <Type>2</Type>
+            <SpawnInterval>3000</SpawnInterval>
+            <PositionX>450</PositionX>
+            <PositionY>-10.0</PositionY>
+            <Amount>15</Amount>
+        </Enemy>
+        <Enemy>
             <Type>1</Type>
             <SpawnInterval>5000</SpawnInterval>
             <PositionX>100</PositionX>
@@ -69,9 +83,36 @@
         </Enemy> -->
     </Enemies>
 
-    <Config>
-        <PrimaryBackgroundColor>RED</PrimaryBackgroundColor>
-        <SecundaryBackgroundColor>RED</SecundaryBackgroundColor>
-        <TertiaryBackgroundColor>RED</TertiaryBackgroundColor>
-    </Config>
+    <Backgrounds>
+        <Background>
+            <Color>
+                <R>0</R>
+                <G>191</G>
+                <B>255</B>
+            </Color>
+            <NumOfStars>50</NumOfStars>
+            <Speed>0.045</Speed>
+            <Size>3</Size>
+        </Background>
+        <Background>
+           <Color>
+                <R>255</R>
+                <G>85</G>
+                <B>0</B>
+            </Color>
+            <NumOfStars>50</NumOfStars>
+            <Speed>0.070</Speed>
+            <Size>2</Size>
+        </Background>
+        <Background>
+           <Color>
+                <R>230</R>
+                <G>245</G>
+                <B>255</B>
+            </Color>
+            <NumOfStars>120</NumOfStars>
+            <Speed>0.100</Speed>
+            <Size>1</Size>
+        </Background>
+    </Backgrounds>
 </Phase>

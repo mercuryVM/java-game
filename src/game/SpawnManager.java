@@ -12,7 +12,7 @@ public class SpawnManager {
     private long nextEnemy1Interval = 0, nextEnemy2Interval = 0, nextBossInterval = 0;
     private long nextPowerup = 0;
     private long nextRoundTime = -1;
-    private int enemy2Count = 0;
+    public int enemy2Count = 0;
     private Scene currentScene;
 
     public SpawnManager(GameManager gameManager) {
@@ -37,7 +37,7 @@ public class SpawnManager {
     }
 
     // problema: o intervalo sempre vai ser pequeno, pois no config ele é tanto a partir do iniício, mas ao criar os intervalos não temos o início então são valores mto pequenos
-    public void Update(float deltaTime, long currentTime) {
+    public void Update(float deltaTime, long currentTime){
         if(!spawnNewEnemies) return;
 
         if(nextRoundTime == -1) {
@@ -58,19 +58,15 @@ public class SpawnManager {
             if(nextEnemy2 != null){
                 if(currentTime > nextEnemy2.getInterval()) {
                     // o inimigo tipo 2 por padrão spawna 10, entao em SceneConfig.xml um inimigo tipo 2 indica 10 spawns desse inimigo
-                    
-                    if(enemy2Count <= 10) {
+
+                    if(nextEnemy2.getNumberOfEnemiesSpawned() < nextEnemy2.getAmountOfEnemies()) {
+                        gameManager.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
+                        nextEnemy2.updateEnemiesSpawned();
                         nextEnemy2.updateSpawnInterval(currentTime + 120);      // se nao deu 10 inimigos ainda, continua spawnando
                     } else {
                         this.currentScene.removeRecentlySpawnedEnemy(nextEnemy2);        // tira o inimigo tipo 2 que spawnou da lista
                         nextEnemy2 = this.currentScene.getNextEnemyInterval(2);     // se deu 10, pega o proximo tipo 2 do config
                     }
-
-                    if(nextEnemy2 != null){
-                        gameManager.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
-                        enemy2Count++;
-                    }
-    
                 }
             }
         }
@@ -82,6 +78,9 @@ public class SpawnManager {
             }
     
             if(currentTime > nextEnemy2Interval) {
+                if(enemy2Count < 0)
+                    enemy2Count = 0;
+
                 if(enemy2Count < 10) {
                     nextEnemy2Interval = currentTime + 120;
                 }else {

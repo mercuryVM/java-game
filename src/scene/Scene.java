@@ -11,94 +11,147 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import scene.config.BackgroundConfig;
 import scene.config.EntityConfig;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 public class Scene {
     private ArrayList<EntityConfig> enemiesConfig = new ArrayList<EntityConfig>();
-    Color primaryColor;
-    Color secundaryColor;
-    Color tertiaryColor;
+    public ArrayList<BackgroundConfig> backgroundsConfig = new ArrayList<BackgroundConfig>();
     long initialTime;
     int currentSceneIndex;
 
-    private static Color getColorByName(String colorName) {
-        try {
-            Field field = Color.class.getField(colorName.toUpperCase());
-            return (Color) field.get(null);
-        } catch (Exception e) {
-            return Color.BLACK; // cor padrão se der erro
-        }
-    }
-
     public Scene(String file, long currentTime, int currentSceneIndex) throws IOException, SAXException, ParserConfigurationException {
-        File xmlFile = new File(file);          // "PhaseOneConfig.xml"
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(xmlFile);
-        doc.getDocumentElement().normalize();
-
-        NodeList enemyNodes = doc.getElementsByTagName("Enemy");
-        String pc = doc.getElementsByTagName("PrimaryBackgroundColor").item(0).getTextContent();
-        String sc = doc.getElementsByTagName("SecundaryBackgroundColor").item(0).getTextContent();
-        String tc = doc.getElementsByTagName("TertiaryBackgroundColor").item(0).getTextContent();
-
-        if(!pc.isEmpty())
-            this.primaryColor = getColorByName(pc);
-        else
-            this.primaryColor = Color.gray;
-        if(!sc.isEmpty())
-            this.secundaryColor = getColorByName(sc);
-        else
-            this.secundaryColor = Color.black;
-        if(!tc.isEmpty())
-            this.secundaryColor = getColorByName(tc);
-
-        this.initialTime = currentTime;
-        this.currentSceneIndex = currentSceneIndex;
-
-        for (int i = 0; i < enemyNodes.getLength(); i++) {
-            Node node = enemyNodes.item(i);
-
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element e = (Element) node;
-
-                String type = e.getElementsByTagName("Type").item(0).getTextContent();
-                String interval = (e.getElementsByTagName("SpawnInterval").item(0).getTextContent());
-                String posX = e.getElementsByTagName("PositionX").item(0).getTextContent();
-                String posY = e.getElementsByTagName("PositionY").item(0).getTextContent();
-                    
-                if(type.isEmpty())
-                    type = "1";
-                if(interval.isEmpty())
-                    interval = "1000";
-                if(posX.isEmpty())
-                    posX = "250.0";
-                if(posY.isEmpty())
-                    posY = "-10.0";
-                
-                EntityConfig enemy = new EntityConfig
-                (
-                    Integer.parseInt(type), 
-                    (currentTime + Long.parseLong(interval)), 
-                    Float.parseFloat(posX), 
-                    Float.parseFloat(posY)
-                );
-                enemiesConfig.add(enemy);
-            }
+        try{
+            this.initialTime = currentTime;
+            this.currentSceneIndex = currentSceneIndex;
+            getBackgroundsConfigFromFile(file, currentTime);
+            getEnemiesConfigFromFile(file, currentTime);
+        }
+        catch(Exception e){
+            throw e;
         }
     }
 
     public Scene(){     // instancia sem parametro caso jogo esteja no modo infinito
-        this.primaryColor = Color.GRAY;
-        this.secundaryColor = Color.BLACK;
-        this.tertiaryColor = null;
+        this.backgroundsConfig.add(new BackgroundConfig(100, 0.045f, new Color(135, 206, 250), 2));
+        this.backgroundsConfig.add(new BackgroundConfig(50, 0.070f, new Color(230, 230, 250), 3));
+        this.backgroundsConfig.add(new BackgroundConfig(50, 0.100f, new Color(152, 255, 152), 1));
         this.currentSceneIndex = -1;
         this.enemiesConfig = null;
+    }
+
+    private void getEnemiesConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+        try{
+            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+            
+            NodeList enemyNodes = doc.getElementsByTagName("Enemy");
+            for (int i = 0; i < enemyNodes.getLength(); i++) {
+                Node node = enemyNodes.item(i);
+    
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element e = (Element) node;
+    
+                    int amount = 10;
+                    String type = fetchElementData(e, "Type");
+                    String interval = fetchElementData(e, "SpawnInterval");
+                    String posX = fetchElementData(e, "PositionX");
+                    String posY = fetchElementData(e, "PositionY");
+                    Node amt = e.getElementsByTagName("Amount").item(0);
+                        
+                    if(amt != null && !amt.getTextContent().isEmpty())
+                        amount = Integer.parseInt(amt.getTextContent());
+    
+                    if(type.isEmpty())
+                        type = "1";
+                    if(interval.isEmpty())
+                        interval = "1000";
+                    if(posX.isEmpty())
+                        posX = "250.0";
+                    if(posY.isEmpty())
+                        posY = "-10.0";
+                    
+                    EntityConfig enemy = new EntityConfig
+                    (
+                        Integer.parseInt(type), 
+                        (currentTime + Long.parseLong(interval)), 
+                        Float.parseFloat(posX), 
+                        Float.parseFloat(posY),
+                        amount
+                    );
+                    enemiesConfig.add(enemy);
+                }
+            }
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    private void getBackgroundsConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+        try{
+            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+            
+            NodeList backgroundNodes = doc.getElementsByTagName("Background");
+    
+            for(int j = 0; j < backgroundNodes.getLength(); j++){
+                Node node = backgroundNodes.item(j);
+    
+                if(node.getNodeType() == Node.ELEMENT_NODE){
+                    Element e = (Element) node;
+                    int R,G,B = 0;
+                    
+                    String Rstring = fetchElementData(e, "R");
+                    String Gstring = fetchElementData(e, "G");
+                    String Bstring = fetchElementData(e, "B");
+                    String numStars = fetchElementData(e, "NumOfStars");
+                    String speed = fetchElementData(e, "Speed");
+                    String size = fetchElementData(e, "Size");
+    
+                    if(Rstring.isEmpty() || Gstring.isEmpty() || Bstring.isEmpty()){
+                        Rstring = "255"; Gstring = "255"; Bstring = "255";
+                    }
+                    if(numStars.isEmpty())
+                        numStars = "100";
+                    if(speed.isEmpty())
+                        speed = "0.05";
+                    if(size.isEmpty())
+                        size = "2";
+    
+                    R = Integer.parseInt(Rstring);
+                    G = Integer.parseInt(Gstring);
+                    B = Integer.parseInt(Bstring);
+    
+                    BackgroundConfig bgconfig = new BackgroundConfig
+                    (
+                        Integer.parseInt(numStars),
+                        Float.parseFloat(speed),
+                        new Color(R,G,B),
+                        Integer.parseInt(size)
+                    );
+    
+                    backgroundsConfig.add(bgconfig);
+                }
+            }
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    private String fetchElementData(Element e, String data){
+        return e.getElementsByTagName(data).item(0).getTextContent();
     }
 
     public EntityConfig getNextEnemyInterval(int type){
@@ -117,6 +170,10 @@ public class Scene {
 
     public int getIndex(){
         return currentSceneIndex;
+    }
+
+    public int getNumOfEnemies(){
+        return this.enemiesConfig.size();
     }
 
     public void removeRecentlySpawnedEnemy(EntityConfig e){

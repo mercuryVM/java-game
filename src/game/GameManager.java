@@ -14,10 +14,10 @@ import input.Input;
 import libraries.GameLib;
 import math.Vector2;
 import scene.Scene;
+import scene.config.BackgroundConfig;
 import scene.config.GameConfig;
 import time.Time;
 
-import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -43,19 +43,27 @@ public class GameManager {
     public GameManager(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
 
-        backgrounds.add(new Background(20, 0.070f, Color.DARK_GRAY, 2));
-        backgrounds.add(new Background(50, 0.045f, Color.GRAY, 3));
-        backgrounds.add(new Background(100, 0.025f, new Color(0.1f, 0, 0.3f), 2));
-
         player = new Player(this, gameConfig.playerHealth);
         player.setActive();
         player.velocity = new Vector2(0.25f, 0.25f);
         player.SetSpawn();
-        this.currentGameMode = 0;
+
+        if(gameConfig.numberOfScenes > 0)   // se na config do jogo tem fases, inicia o jogo em fases
+            this.currentGameMode = 0;
+        else
+            this.currentGameMode = 1;       // se nao tem, inicia infinito
         
         input = new Input(player);
 
         spawnManager = new SpawnManager(this);
+    }
+
+    public void RenderBackground(){
+        this.backgrounds.clear();
+        for(int i = 0; i < this.currentScene.backgroundsConfig.size(); i++){
+            BackgroundConfig bgc = this.currentScene.backgroundsConfig.get(i);
+            this.backgrounds.add(new Background(bgc.getNumberOfStars(), bgc.getStarsSpeed(), bgc.getStarsColor(), bgc.getStarsSize()));
+        }
     }
 
     public void LoadScene(int newSceneIndex, long currentTime){
@@ -64,10 +72,12 @@ public class GameManager {
                 String newScenePath = gameConfig.sceneConfigs.get(newSceneIndex);
                 Scene scene = new Scene(newScenePath, currentTime, newSceneIndex);
                 this.currentScene = scene;
+                RenderBackground();
             }
             if(newSceneIndex == -1){        // com cena padrão (modo de jogo infinito)
                 Scene scene = new Scene();
                 this.currentScene = scene;
+                RenderBackground();
             }
         }
         catch(IOException | SAXException | ParserConfigurationException e){
@@ -93,17 +103,25 @@ public class GameManager {
     }
 
     private void UpdateSceneAndGameMode(){
-        if(this.currentScene == null && this.currentGameMode == 0){     // se for modo de níveis, e a cena ainda nao foi carregada, carrega a primeira
-            LoadScene(0, Time.time);
-            spawnManager.prepareEnemiesSpawns();
-            System.out.println("começando primeira fase");
+        if(this.currentScene == null){      // se a fase ainda nao foi carregada
+            if(this.currentGameMode == 0){          // e o modo é de fases
+                LoadScene(0, Time.time);        // carrega a primeira fase    
+                spawnManager.prepareEnemiesSpawns();
+                System.out.println("começando primeira fase");
+            }   
+            if(this.currentGameMode == 1){          // se o modo é infiníto
+                LoadScene(-1, Time.time);               // começa direto no infinito
+                System.out.println("iniciando modo de jogo infinito");
+            }
+            return;
+
         }
         if(currentScene.SceneIsDone() && currentScene.getIndex()+1 < gameConfig.numberOfScenes && currentScene.getIndex() != -1){    // se o boss morreu e ainda nao acabaram as cenas, carrega a proxima
             LoadScene(currentScene.getIndex()+1, Time.time);
             spawnManager.prepareEnemiesSpawns();
             System.out.println("começando proxima fase");
         }
-        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 >= gameConfig.numberOfScenes){       // se o boss morreu e acabaram as cenas, muda pro modo infinito
+        if(currentScene.SceneIsDone() && currentScene.getIndex()+1 >= gameConfig.numberOfScenes && currentGameMode == 0){       // se o boss morreu e acabaram as cenas, muda pro modo infinito
             LoadScene(-1, Time.time);
             this.currentGameMode = 1;
             System.out.println("modo de jogo alterado para infinito");
