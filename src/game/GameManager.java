@@ -106,7 +106,7 @@ public class GameManager {
         if(this.currentScene == null){      // se a fase ainda nao foi carregada
             if(this.currentGameMode == 0){          // e o modo é de fases
                 LoadScene(0, Time.time);        // carrega a primeira fase    
-                spawnManager.prepareEnemiesSpawns();
+                spawnManager.prepareSpawns();
                 System.out.println("começando primeira fase");
             }   
             if(this.currentGameMode == 1){          // se o modo é infiníto
@@ -118,7 +118,7 @@ public class GameManager {
         }
         if(currentScene.SceneIsDone() && currentScene.getIndex()+1 < gameConfig.numberOfScenes && currentScene.getIndex() != -1){    // se o boss morreu e ainda nao acabaram as cenas, carrega a proxima
             LoadScene(currentScene.getIndex()+1, Time.time);
-            spawnManager.prepareEnemiesSpawns();
+            spawnManager.prepareSpawns();
             System.out.println("começando proxima fase");
         }
         if(currentScene.SceneIsDone() && currentScene.getIndex()+1 >= gameConfig.numberOfScenes && currentGameMode == 0){       // se o boss morreu e acabaram as cenas, muda pro modo infinito
@@ -250,6 +250,17 @@ public class GameManager {
         var powerup = new HealthPowerup(this);
         powerup.setActive();
         powerup.position = new Vector2((float) (Math.random() * (GameLib.WIDTH - 20.0) + 10.0), -10.0f);
+        powerup.velocity = new Vector2(0.05f, 0.05f);
+        powerup.angle = (3f * (float) Math.PI) / 2f;
+        powerup.rotationVelocity = 0.0f;
+
+        powerups.add(powerup);
+    }
+
+    public void SpawnPowerup(float posX, float posY) {      // overload pra modo de fase com powerups predefinidos 
+        var powerup = new HealthPowerup(this);
+        powerup.setActive();
+        powerup.position = new Vector2(posX, posY);
         powerup.velocity = new Vector2(0.05f, 0.05f);
         powerup.angle = (3f * (float) Math.PI) / 2f;
         powerup.rotationVelocity = 0.0f;

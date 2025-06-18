@@ -1,5 +1,6 @@
 package scene;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,8 +12,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import entities.player.modifiers.DoubleTapModifier;
+import entities.player.modifiers.HealthAddModifier;
+import entities.player.modifiers.InvincibleModifier;
+import entities.player.modifiers.PlayerModifier;
 import scene.config.BackgroundConfig;
 import scene.config.EntityConfig;
+import scene.config.PowerupConfig;
 
 import java.awt.*;
 import java.io.File;
@@ -21,6 +27,7 @@ import java.io.IOException;
 public class Scene {
     private ArrayList<EntityConfig> enemiesConfig = new ArrayList<EntityConfig>();
     public ArrayList<BackgroundConfig> backgroundsConfig = new ArrayList<BackgroundConfig>();
+    public ArrayList<PowerupConfig> powerUpsConfig = new ArrayList<PowerupConfig>();
     long initialTime;
     int currentSceneIndex;
 
@@ -30,6 +37,11 @@ public class Scene {
             this.currentSceneIndex = currentSceneIndex;
             getBackgroundsConfigFromFile(file, currentTime);
             getEnemiesConfigFromFile(file, currentTime);
+            getPowerupsConfigFromFile(file, currentTime);
+
+            // ao ordenar agora, a operação de pegar o proximo inimigo (repetida varias vezes) fica bem mais rápida
+            powerUpsConfig.sort(Comparator.comparing(p -> p.getSpawnInterval()));
+            enemiesConfig.sort(Comparator.comparing(e -> e.getInterval()));
         }
         catch(Exception e){
             throw e;
@@ -150,13 +162,74 @@ public class Scene {
         }
     }
 
+    private void getPowerupsConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+        try{
+            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+
+            NodeList powerupNodes = doc.getElementsByTagName("PowerUp");
+    
+            for(int j = 0; j < powerupNodes.getLength(); j++){
+                Node node = powerupNodes.item(j);
+
+                ArrayList<PlayerModifier> modifiersList = new ArrayList<>();
+    
+                if(node.getNodeType() == Node.ELEMENT_NODE){
+                    Element e = (Element) node;
+                    
+                    NodeList powerupmodifiers = e.getElementsByTagName("Modifier");
+                    
+                    for(int i = 0; i < powerupmodifiers.getLength(); i++){          // pra cada powerup, roda seus modifiers
+                        if(powerupmodifiers.item(i).getTextContent() == "Invincibility"){
+                            modifiersList.add(new InvincibleModifier());
+                        }
+                        if(powerupmodifiers.item(i).getTextContent() == "Health"){
+                            modifiersList.add(new HealthAddModifier(100));
+                        }
+                        if(powerupmodifiers.item(i).getTextContent() == "Double-tap"){
+                            modifiersList.add(new DoubleTapModifier());
+                        }
+                        
+                    }
+                    
+                    String interval = fetchElementData(e, "SpawnInterval");
+                    String posX = fetchElementData(e, "PositionX");
+                    String posY = fetchElementData(e, "PositionY");
+                    
+                    if(interval.isEmpty())
+                        interval = "5000";
+                    if(posX.isEmpty())
+                        posX = "250";
+                    if(posY.isEmpty())
+                        posY = "-10.0";
+    
+                    PowerupConfig pConfig = new PowerupConfig 
+                    (
+                        (currentTime + Long.parseLong(interval)),
+                        Float.parseFloat(posX),
+                        Float.parseFloat(posY)
+                    );
+    
+                    pConfig.modifiers = modifiersList;
+                    powerUpsConfig.add(pConfig);
+                }
+            }
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
     private String fetchElementData(Element e, String data){
         return e.getElementsByTagName(data).item(0).getTextContent();
     }
 
     public EntityConfig getNextEnemyInterval(int type){
         int tamanho = this.enemiesConfig.size();
-        if(tamanho > 0){
+        if(tamanho > 0){        // como ta ordenado por spawn interval, o proximo inimigo do tipo eh o primeiro desse tipo que aparecer na lista
             for(int i = 0; i < tamanho; i++){      // roda as entidades da cena e procura o primeiro intervalo de spawn de um tipo de inimigo
                 EntityConfig e = enemiesConfig.get(i);
                 if (e.getType() == type){
@@ -166,6 +239,22 @@ public class Scene {
         }
 
         return null;
+    }
+
+    public PowerupConfig getNextPowerupInterval(){
+        int tamanho = this.powerUpsConfig.size();
+        
+        if(tamanho > 0){
+            PowerupConfig SmallestIntervalPowerup = this.powerUpsConfig.get(0); // como ta ordenado por spawn e estamos exluindo ao spawnar, o proximo eh sempre o primeiro da lista
+            return SmallestIntervalPowerup;
+        }
+        return null;
+    } 
+
+    public void removeRecentlySpawnedPowerup(PowerupConfig p){
+        if(p != null){
+            this.powerUpsConfig.remove(p);
+        }
     }
 
     public int getIndex(){

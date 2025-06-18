@@ -229,8 +229,8 @@
     <PowerUps>
         <PowerUp>
             <Modifiers>
-                <Modifier>HealthAdd</Modifier>
-                <Modifier>Invincible</Modifier>
+                <Modifier>Health</Modifier>
+                <Modifier>Invincibility</Modifier>
             </Modifiers>
             <SpawnInterval>5000</SpawnInterval>
             <PositionX>150</PositionX>
@@ -238,8 +238,8 @@
         </PowerUp>
         <PowerUp>
             <Modifiers>
-                <Modifier>Invincible</Modifier>
-                <Modifier>DoubleTap</Modifier>
+                <Modifier>Invincibility</Modifier>
+                <Modifier>Double-tap</Modifier>
             </Modifiers>
             <SpawnInterval>10000</SpawnInterval>
             <PositionX>500</PositionX>
@@ -247,9 +247,9 @@
         </PowerUp>
         <PowerUp>
             <Modifiers>
-                <Modifier>Invincible</Modifier>
-                <Modifier>DoubleTap</Modifier>
-                <Modifier>HealthAdd</Modifier>
+                <Modifier>Invincibility</Modifier>
+                <Modifier>Double-tap</Modifier>
+                <Modifier>Health</Modifier>
             </Modifiers>
             <SpawnInterval>15000</SpawnInterval>
             <PositionX>220</PositionX>

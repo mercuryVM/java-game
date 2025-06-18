@@ -2,6 +2,7 @@ package game;
 
 import scene.Scene;
 import scene.config.EntityConfig;
+import scene.config.PowerupConfig;
 import time.Time;
 
 public class SpawnManager {
@@ -10,7 +11,8 @@ public class SpawnManager {
     private boolean spawnNewEnemies = true;
     private EntityConfig nextEnemy1 = null, nextEnemy2 = null, nextBoss = null;
     private long nextEnemy1Interval = 0, nextEnemy2Interval = 0, nextBossInterval = 0;
-    private long nextPowerup = 0;
+    private PowerupConfig nextPowerup = null;
+    private long nextPowerupInterval = 0;
     private long nextRoundTime = -1;
     public int enemy2Count = 0;
     private Scene currentScene;
@@ -27,12 +29,13 @@ public class SpawnManager {
         nextRoundTime = Time.time + 5 * 1000;
     }
 
-    public void prepareEnemiesSpawns(){
+    public void prepareSpawns(){
         if(this.gameManager.currentGameMode == 0){
             this.currentScene = gameManager.getCurrentScene();
             nextEnemy1 = currentScene.getNextEnemyInterval(1);
             nextEnemy2 = currentScene.getNextEnemyInterval(2);
             nextBoss = currentScene.getNextEnemyInterval(3);
+            nextPowerup = currentScene.getNextPowerupInterval();
         }
     }
 
@@ -69,6 +72,14 @@ public class SpawnManager {
                     }
                 }
             }
+
+            if(nextPowerup != null){
+                if(currentTime > nextPowerup.getSpawnInterval()) {
+                    gameManager.SpawnPowerup(nextPowerup.getPositionX(), nextPowerup.getPositionY());
+                    this.currentScene.removeRecentlySpawnedPowerup(nextPowerup);
+                    nextPowerup = this.currentScene.getNextPowerupInterval();
+                }
+            }
         }
 
         if(this.gameManager.currentGameMode == 1){      // se gameMode for infinito usa spawns aleatórios infinitos
@@ -90,12 +101,13 @@ public class SpawnManager {
                 gameManager.SpawnEnemyB();
                 enemy2Count++;
             }
+
+            if(currentTime > nextPowerupInterval) {
+                gameManager.SpawnPowerup();
+                nextPowerupInterval = currentTime + 30 * 1000;
+            }
         }
 
-        if(currentTime > nextPowerup) {
-            gameManager.SpawnPowerup();
-            nextPowerup = currentTime + 30 * 1000;
-        }
     }
 
     public void GameOver() {
