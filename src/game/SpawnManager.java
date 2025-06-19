@@ -75,7 +75,7 @@ public class SpawnManager {
 
             if(nextPowerup != null){
                 if(currentTime > nextPowerup.getSpawnInterval()) {
-                    gameManager.SpawnPowerup(nextPowerup.getPositionX(), nextPowerup.getPositionY());
+                    gameManager.SpawnPowerup(nextPowerup);
                     this.currentScene.removeRecentlySpawnedPowerup(nextPowerup);
                     nextPowerup = this.currentScene.getNextPowerupInterval();
                 }
@@ -92,7 +92,7 @@ public class SpawnManager {
                 if(enemy2Count < 0)
                     enemy2Count = 0;
 
-                if(enemy2Count < 10) {
+                if(enemy2Count >= 0 && enemy2Count < 10) {
                     nextEnemy2Interval = currentTime + 120;
                 }else {
                     nextEnemy2Interval = currentTime + 10000;

@@ -38,7 +38,10 @@ public class GameConfig {
 
             var gameElement = document.getDocumentElement();
             this.playerHealth = Float.parseFloat(gameElement.getElementsByTagName("playerHealth").item(0).getTextContent());
-            this.numberOfScenes = Integer.parseInt(gameElement.getElementsByTagName("numberOfScenes").item(0).getTextContent());
+            if(sceneConfigs.size() > 0)
+                this.numberOfScenes = Integer.parseInt(gameElement.getElementsByTagName("numberOfScenes").item(0).getTextContent());
+            else
+                this.numberOfScenes = 0;
         }
         catch(Exception e){
             throw e;

@@ -183,16 +183,15 @@ public class Scene {
                     NodeList powerupmodifiers = e.getElementsByTagName("Modifier");
                     
                     for(int i = 0; i < powerupmodifiers.getLength(); i++){          // pra cada powerup, roda seus modifiers
-                        if(powerupmodifiers.item(i).getTextContent() == "Invincibility"){
+                        if(powerupmodifiers.item(i).getTextContent().equals("Invincibility")){
                             modifiersList.add(new InvincibleModifier());
                         }
-                        if(powerupmodifiers.item(i).getTextContent() == "Health"){
+                        if(powerupmodifiers.item(i).getTextContent().equals("Health")){
                             modifiersList.add(new HealthAddModifier(100));
                         }
-                        if(powerupmodifiers.item(i).getTextContent() == "Double-tap"){
+                        if(powerupmodifiers.item(i).getTextContent().equals("Double-tap")){
                             modifiersList.add(new DoubleTapModifier());
                         }
-                        
                     }
                     
                     String interval = fetchElementData(e, "SpawnInterval");

@@ -20,9 +20,10 @@ public class UI {
 
     private void RenderTexts() {
         GameLib.setColor(Color.WHITE);
-        GameLib.drawString(10, 58, "Score: " + gameManager.getCurrentScore());
-        GameLib.drawString(GameLib.WIDTH - 100, 58, "Vidas: " + gameManager.getPlayerLives());
-        GameLib.drawString(10, 78, "Health: " + ((Float)gameManager.getCurrentHealth()).intValue());
+        GameLib.drawString(10, 60, "Score: " + gameManager.getCurrentScore());
+        GameLib.drawString(GameLib.WIDTH - 100, 60, "Vidas: " + gameManager.getPlayerLives());
+        GameLib.drawString(10, 80, "Health: " + ((Float)gameManager.getCurrentHealth()).intValue());
+        RenderSceneText();
 
         if(isGameOver) {
             GameLib.drawString((GameLib.WIDTH / 2f) - 50f, GameLib.HEIGHT / 2f, "FIM DE JOGO :(");
@@ -34,8 +35,15 @@ public class UI {
         for(int i = 0; i < modifiers.size(); i++) {
             var modifier = modifiers.get(i);
             GameLib.setColor(modifier.getModifier().getColor());
-            GameLib.drawString(10, 100 + i * 25, "+ " + modifier.getModifier().getName() + " modifier" + ": " + modifier.getTimeLeft() + "s");
+            GameLib.drawString(10, 120 + i * 25, "+ " + modifier.getModifier().getName() + " modifier" + ": " + modifier.getTimeLeft() + "s");
         }
+    }
+
+    public void RenderSceneText(){
+        if(gameManager.currentGameMode == 0)
+            GameLib.drawString(10, 100, "Fase: " + ((int)(gameManager.currentScene.getIndex()+1)));
+        else
+            GameLib.drawString(10, 100, "Modo: Infinito");
     }
 
     public void GameOver() {

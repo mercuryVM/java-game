@@ -2,27 +2,27 @@
     <Enemies>
         <Enemy>
             <Type>2</Type>
-            <SpawnInterval>3000</SpawnInterval>
+            <SpawnInterval>4000</SpawnInterval>
             <PositionX>100</PositionX>
             <PositionY>-10.0</PositionY>
             <Amount>10</Amount>
         </Enemy>
         <Enemy>
             <Type>2</Type>
-            <SpawnInterval>3000</SpawnInterval>
+            <SpawnInterval>5200</SpawnInterval>
             <PositionX>450</PositionX>
             <PositionY>-10.0</PositionY>
             <Amount>15</Amount>
         </Enemy>
         <Enemy>
             <Type>1</Type>
-            <SpawnInterval>5000</SpawnInterval>
+            <SpawnInterval>3500</SpawnInterval>
             <PositionX>100</PositionX>
             <PositionY>-10.0</PositionY>
         </Enemy>
         <Enemy>
             <Type>1</Type>
-            <SpawnInterval>6000</SpawnInterval>
+            <SpawnInterval>7000</SpawnInterval>
             <PositionX>487</PositionX>
             <PositionY>-10.0</PositionY>
         </Enemy>

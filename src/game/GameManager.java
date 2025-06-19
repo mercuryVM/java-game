@@ -16,6 +16,7 @@ import math.Vector2;
 import scene.Scene;
 import scene.config.BackgroundConfig;
 import scene.config.GameConfig;
+import scene.config.PowerupConfig;
 import time.Time;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class GameManager {
     private final Input input;
     private final SpawnManager spawnManager;
     private final GameConfig gameConfig;
-    private Scene currentScene = null;
+    public Scene currentScene = null;
     private int currentScore = 0;
 
     public GameManager(GameConfig gameConfig) {
@@ -124,6 +125,7 @@ public class GameManager {
         if(currentScene.SceneIsDone() && currentScene.getIndex()+1 >= gameConfig.numberOfScenes && currentGameMode == 0){       // se o boss morreu e acabaram as cenas, muda pro modo infinito
             LoadScene(-1, Time.time);
             this.currentGameMode = 1;
+            this.currentScene = null;
             System.out.println("modo de jogo alterado para infinito");
         }
     }
@@ -257,10 +259,11 @@ public class GameManager {
         powerups.add(powerup);
     }
 
-    public void SpawnPowerup(float posX, float posY) {      // overload pra modo de fase com powerups predefinidos 
-        var powerup = new HealthPowerup(this);
+    public void SpawnPowerup(PowerupConfig pwupConfig) {      // overload pra modo de fase com powerups predefinidos 
+        var powerup = new Powerup(this);
+        powerup.modifierList = pwupConfig.modifiers;
         powerup.setActive();
-        powerup.position = new Vector2(posX, posY);
+        powerup.position = new Vector2(pwupConfig.getPositionX(), pwupConfig.getPositionY());
         powerup.velocity = new Vector2(0.05f, 0.05f);
         powerup.angle = (3f * (float) Math.PI) / 2f;
         powerup.rotationVelocity = 0.0f;
