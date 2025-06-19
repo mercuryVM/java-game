@@ -2,7 +2,9 @@
     <playerHealth>100.0</playerHealth>
     <numberOfScenes>2</numberOfScenes>
     <scenes>
-        <sceneConfig>Scene1Config.xml</sceneConfig>
+        <!-- <sceneConfig>Scene1Config.xml</sceneConfig>
+        <sceneConfig>Scene2Config.xml</sceneConfig> -->
+        <sceneConfig>Scene1Config.txt</sceneConfig>
         <sceneConfig>Scene2Config.xml</sceneConfig>
     </scenes>
     <modes>

@@ -1,6 +1,8 @@
 package scene;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +24,7 @@ import scene.config.PowerupConfig;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Scene {
@@ -35,16 +38,18 @@ public class Scene {
         try{
             this.initialTime = currentTime;
             this.currentSceneIndex = currentSceneIndex;
-            getBackgroundsConfigFromFile(file, currentTime);
-            getEnemiesConfigFromFile(file, currentTime);
-            getPowerupsConfigFromFile(file, currentTime);
+
+            if(file.toLowerCase().endsWith(".txt"))
+                getConfigsFromTxt(file, currentTime);
+            if(file.toLowerCase().endsWith(".xml"))
+                getConfigsFromXml(file, currentTime);
 
             // ao ordenar agora, a operação de pegar o proximo inimigo (repetida varias vezes) fica bem mais rápida
             powerUpsConfig.sort(Comparator.comparing(p -> p.getSpawnInterval()));
             enemiesConfig.sort(Comparator.comparing(e -> e.getInterval()));
         }
         catch(Exception e){
-            throw e;
+            System.out.println(e.getMessage());
         }
     }
 
@@ -56,9 +61,20 @@ public class Scene {
         this.enemiesConfig = null;
     }
 
-    private void getEnemiesConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+    private void getConfigsFromXml(String file, long currentTime){
         try{
-            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            getEnemiesConfigFromXml(file, currentTime);
+            getBackgroundsConfigFromXml(file, currentTime);
+            getPowerupsConfigFromXml(file, currentTime);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    private void getEnemiesConfigFromXml(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+        try{
+            File xmlFile = new File(file);          // "SceneXConfig.xml"
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlFile);
@@ -107,9 +123,9 @@ public class Scene {
         }
     }
 
-    private void getBackgroundsConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+    private void getBackgroundsConfigFromXml(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
         try{
-            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            File xmlFile = new File(file);          // "SceneXConfig.xml"
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlFile);
@@ -162,9 +178,9 @@ public class Scene {
         }
     }
 
-    private void getPowerupsConfigFromFile(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
+    private void getPowerupsConfigFromXml(String file, long currentTime) throws IOException, SAXException, ParserConfigurationException {
         try{
-            File xmlFile = new File(file);          // "PhaseXConfig.xml"
+            File xmlFile = new File(file);          // "SceneXConfig.xml"
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlFile);
@@ -216,6 +232,83 @@ public class Scene {
                     powerUpsConfig.add(pConfig);
                 }
             }
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    private void getConfigsFromTxt(String file, long currentTime) throws FileNotFoundException, InputMismatchException {
+        try{
+            // pro caso do .txt precisamos assumir algumas coisas que no xml era mais "solto" e teria mais margem para problemas
+            // por exemplo, não pode acontecer de eu ter uma linha inimigo, ter tipo, não ter posX e ter posY. 
+            // Todos os valores de chave até posY precisam ser preenchidos
+
+            File txtFile = new File(file);          // "SceneXConfig.txt"
+            Scanner FileScanner = new Scanner(txtFile);
+
+            while (FileScanner.hasNextLine()) {
+                String lineScanner = FileScanner.nextLine().trim();
+
+                if (lineScanner.isEmpty()) {
+                    continue; // pula as linhas vazias
+                }
+                
+                Scanner linhaScanner = new Scanner(lineScanner);
+                String chave = linhaScanner.next();
+
+                if(chave.equals("ENEMY")){
+                    // amount pode estar vazio 
+                    // com excessão do amount que é a última posição e pode ou não estar preenchida
+                    int type = linhaScanner.nextInt();
+                    long interval = linhaScanner.nextLong();
+                    float posX = linhaScanner.nextFloat();
+                    float posY = linhaScanner.nextFloat();
+                    int amount = 1;
+                    if(linhaScanner.hasNext())
+                        amount = linhaScanner.nextInt();
+
+                    EntityConfig enemy = new EntityConfig(type, interval, posX, posY, amount);
+                    enemiesConfig.add(enemy);
+                }
+                if(chave.equals("POWERUP")){    
+                    ArrayList<PlayerModifier> modifiersList = new ArrayList<>();
+                    
+                    long interval = linhaScanner.nextLong();
+                    float posX = linhaScanner.nextFloat();
+                    float posY = linhaScanner.nextFloat();
+
+                    // posso nao ter nenhum modifier e posso ter varios, conforme for tendo vc vai adicionando
+                    while(linhaScanner.hasNext()){
+                        String modifier = linhaScanner.next();
+                        if(modifier.equals("Invincibility"))
+                            modifiersList.add(new InvincibleModifier());
+                        if(modifier.equals("Health"))
+                            modifiersList.add(new HealthAddModifier(100));
+                        if(modifier.equals("Double-tap"))
+                            modifiersList.add(new DoubleTapModifier());
+                    }
+    
+                    PowerupConfig pConfig = new PowerupConfig(interval, posX, posY);     
+                    pConfig.modifiers = modifiersList;
+                    powerUpsConfig.add(pConfig);
+                }
+                if(chave.equals("BACKGROUND")){                    
+                    int R = linhaScanner.nextInt();
+                    int G = linhaScanner.nextInt();
+                    int B = linhaScanner.nextInt();
+                    int numStars = linhaScanner.nextInt();
+                    String speed = linhaScanner.next();
+                    int size = linhaScanner.nextInt();
+    
+                    BackgroundConfig bgConfig = new BackgroundConfig(numStars, Float.parseFloat(speed), new Color(R,G,B), size);
+                    backgroundsConfig.add(bgConfig);
+                }
+
+                linhaScanner.close();
+            }
+
+            FileScanner.close();
         }
         catch(Exception e){
             throw e;
