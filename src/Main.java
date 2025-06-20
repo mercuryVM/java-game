@@ -62,8 +62,6 @@ public class Main {
 
 			/* Usada para atualizar o estado dos elementos do jogo    */
 			/* (player, projéteis e inimigos) "delta" indica quantos  */
-			/* ms se passaram desde a última atualização.             */
-
 			delta = System.currentTimeMillis() - currentTime;
 
 			/* Já a variável "currentTime" nos dá o timestamp atual.  */

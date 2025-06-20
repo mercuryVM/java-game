@@ -1,6 +1,5 @@
 package entities.enemies.boss;
 
-
 import game.GameManager;
 import libraries.GameLib;
 import math.Vector2;
@@ -11,11 +10,12 @@ import java.awt.*;
 public class BossA extends Boss{
     protected Vector2 baseVelocity = new Vector2();
     private double InnerRadius;
+    private final float topMargin = 32.0f;  // Apenas a margem superior, igual ao BossB
 
     public BossA(GameManager manager, int bossHealth){
         super(manager, bossHealth);
-        this.baseVelocity.x = 0.05f;
-        this.baseVelocity.y = 0.05f;
+        this.baseVelocity.x = 0.35f;
+        this.baseVelocity.y = 0.35f;
 
         this.velocity = this.baseVelocity.copy();
     }
@@ -25,17 +25,17 @@ public class BossA extends Boss{
         double radius = getRadius();
 
         if(state == State.ACTIVE) {
-
-            if(position.y <= 0 + radius){
+            // Apenas o topo com margem (topMargin)
+            if(position.y <= topMargin + radius){
                 velocity.y = baseVelocity.y * 1;
             }
+            // Bordas laterais e inferior sem margem (mantido o original)
             if(position.y >= GameLib.HEIGHT - radius){
                 velocity.y = baseVelocity.y * -1;
             }
             if(position.x <= 0 + radius){
                 velocity.x = baseVelocity.x * 1;
             }
-
             if(position.x >= GameLib.WIDTH - radius){
                 velocity.x = baseVelocity.x * -1;
             }
@@ -54,8 +54,8 @@ public class BossA extends Boss{
         return Time.getTimeFromStart() / 1000f;
     }
 
-    private double getRadius(){
-        return Math.abs(Math.cos(getTime()) * 20) + 30;
+    public float getRadius(){
+        return (float) Math.abs(Math.cos(getTime()) * 20) + 40;
     }
 
     @Override
@@ -66,8 +66,6 @@ public class BossA extends Boss{
         double radius = getRadius();
 
         GameLib.drawCircle(position.x, position.y, radius);
-        GameLib.setColor(Color.gray);
-        GameLib.drawLine(position.x, position.y, position.x * Math.cos(getTime()), position.y * Math.sin(getTime()));
         return false;
     }
 }

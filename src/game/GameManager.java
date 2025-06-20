@@ -2,11 +2,13 @@ package game;
 
 import background.Background;
 import entities.Entity;
+import entities.Laser;
 import entities.enemies.Enemy;
 import entities.enemies.EnemyA;
 import entities.enemies.EnemyB;
 import entities.enemies.boss.Boss;
 import entities.enemies.boss.BossA;
+import entities.enemies.boss.BossB;
 import entities.player.Player;
 import entities.powerups.HealthPowerup;
 import entities.powerups.Powerup;
@@ -29,6 +31,7 @@ public class GameManager {
     public final EntityList<Enemy> enemies = new EntityList<>();
     public final EntityList<Projectile> projectiles = new EntityList<>();
     public final EntityList<Powerup> powerups = new EntityList<>();
+    public final EntityList<Laser> lasers = new EntityList<>();
     public final List<Background> backgrounds = new ArrayList<>();
     private final Input input;
     private final SpawnManager spawnManager = new SpawnManager(this);
@@ -42,6 +45,24 @@ public class GameManager {
 
     public Scene getCurrentScene() {
         return gameConfig.sceneList.get(currentScene);
+    }
+
+    public float getCurrentBossHealth(){
+        for (var e : enemies.getEntities()) {
+            if(e instanceof Boss) {
+                return e.getCurrentHealth();
+            }
+        }
+        return 0f;
+    }
+
+    public float getBossHealth(){
+        for (var e : enemies.getEntities()) {
+            if(e instanceof Boss) {
+                return ((Boss) e).getInitialHealth();
+            }
+        }
+        return 0f;
     }
 
     public float getCurrentHealth() {
@@ -76,14 +97,20 @@ public class GameManager {
         enemies.update(deltaTime, currentTime);
         projectiles.update(deltaTime, currentTime);
         powerups.update(deltaTime, currentTime);
+        lasers.update(deltaTime, currentTime);
 
         spawnManager.Update(deltaTime, currentTime);
         CollisionUpdate(deltaTime, currentTime);
     }
 
     private void CollisionUpdate(float deltaTime, long currentTime) {
+        //colisão física
         for (var enemy : enemies.getEntities()) {
-            if (player.isActive() && player.collider.TestCollision(enemy)) {
+            float extraRadius = 0.0f;
+            if(enemy instanceof Boss) {
+                extraRadius = ((Boss) enemy).getRadius();
+            }
+            if (player.isActive() && player.collider.TestCollision(enemy, extraRadius)) {
                 if(player.ApplyDamage(
                         (float)Math.random() * 50.0f
                 )) {
@@ -95,7 +122,7 @@ public class GameManager {
         }
 
         for (var p : powerups.getEntities()) {
-            if (player.isActive() && player.collider.TestCollision(p)) {
+            if (player.isActive() && player.collider.TestCollision(p, 0.0f)) {
                 powerups.scheduleRemoval(p);
                 p.acquire(player);
 
@@ -103,8 +130,18 @@ public class GameManager {
             }
         }
 
+        for (var laser : lasers.getEntities()) {
+            if (player.isActive() && player.collider.TestLaserCollision(laser)) {
+                if(player.ApplyDamage(
+                        (float)Math.random() * 50.0f
+                )) {
+                    ui.ApplyDamage();
+                }
+            }
+        }
+
         for (var projectile : projectiles.getEntities()) {
-            if (player.isActive() && player.collider.TestCollision(projectile) && projectile.sender != player) {
+            if (player.isActive() && player.collider.TestCollision(projectile, 0.0f) && projectile.sender != player) {
                 if(player.ApplyDamage(
                         (float)Math.random() * 50.0f
                 )) {
@@ -114,7 +151,11 @@ public class GameManager {
             }
 
             for (var enemy : enemies.getEntities()) {
-                if (enemy.isActive() && enemy.collider.TestCollision(projectile) && projectile.sender == player) {
+                float extraRadius = 0.0f;
+                if(enemy instanceof Boss) {
+                    extraRadius = ((Boss) enemy).getRadius();
+                }
+                if (enemy.isActive() && enemy.collider.TestCollision(projectile, extraRadius) && projectile.sender == player) {
                     enemy.ApplyDamage(50);
                     currentScore++;
                     projectiles.scheduleRemoval(projectile);
@@ -132,6 +173,7 @@ public class GameManager {
 
         player.Render(deltaTime, currentTime);
         projectiles.render(deltaTime, currentTime);
+        lasers.render(deltaTime, currentTime);
         enemies.render(deltaTime, currentTime);
         powerups.render(deltaTime, currentTime);
 
@@ -198,10 +240,23 @@ public class GameManager {
         boss.angle = (3f * (float) Math.PI) / 2f;
         boss.rotationVelocity = 0.0f;
         boss.setActive();
-
-        System.out.println("aaa");
         enemies.add(boss);
+
+        ui.setIsBoss(true);
     }
+
+    public void SpawnBossB() {
+        var boss = new BossB(this, 5000);
+        //boss.position = new Vector2( 60.0f, 60.0f);
+        //boss.velocity = new Vector2(0.05f, 0.05f);
+        //boss.angle = (3f * (float) Math.PI) / 2f;
+        boss.rotationVelocity = 0.0f;
+        boss.setActive();
+        enemies.add(boss);
+
+        ui.setIsBoss(true);
+    }
+
 
 
     public void AddProjectile(Vector2 position, Vector2 velocity, float radius, Class<? extends Projectile> projectileClass, Entity sender) {
@@ -217,8 +272,41 @@ public class GameManager {
         }
     }
 
+    public void AddLaser(Vector2 position, float rotationSpeed, float length,
+                         Class<? extends Laser> laserClass, Entity sender) {
+        try {
+            Constructor<? extends Laser> constructor = laserClass.getConstructor(
+                    GameManager.class, Vector2.class, float.class, float.class, Entity.class
+            );
+
+            Laser laser = constructor.newInstance(this, position, rotationSpeed, length, sender);
+            lasers.add(laser);
+
+            // Se for um laser de boss, conecta ao boss
+            if(sender instanceof BossB) {
+                ((BossB)sender).setLaser(laser);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void RemoveEnemy(Enemy enemy) {
         enemies.scheduleRemoval(enemy);
+        if (enemy instanceof Boss) {
+            ui.setIsBoss(false);
+
+            if (enemy instanceof BossB) {
+                Laser bossLaser = ((BossB) enemy).getLaser();
+                if (bossLaser != null) {
+                    lasers.scheduleRemoval(bossLaser);
+                }
+            }
+        }
+    }
+
+    public void RemoveLaser(Laser laser) {
+        lasers.scheduleRemoval(laser);
     }
 
     public void RemoveProjectile(Projectile projectile) {

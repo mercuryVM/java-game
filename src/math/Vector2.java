@@ -27,4 +27,13 @@ public class Vector2 {
         dif.y *= dif.y;
         return (float)Math.sqrt(dif.x + dif.y);
     }
+
+    public Vector2 subtract(Vector2 other) {
+        return new Vector2(this.x - other.x, this.y - other.y);
+    }
+
+    public float dot(Vector2 other) {
+        return this.x * other.x + this.y * other.y;
+    }
+
 }
