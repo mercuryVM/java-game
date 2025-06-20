@@ -90,7 +90,6 @@
             <PositionX>244</PositionX>
             <PositionY>-10.0</PositionY>
         </Enemy>
-        
         <Enemy>
             <Type>1</Type>
             <SpawnInterval>8000</SpawnInterval>
@@ -223,7 +222,6 @@
             <PositionX>500</PositionX>
             <PositionY>-10.0</PositionY>
         </Enemy> 
-
     </Enemies>
 
     <PowerUps>

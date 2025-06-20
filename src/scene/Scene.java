@@ -261,22 +261,22 @@ public class Scene {
                     // amount pode estar vazio 
                     // com excessão do amount que é a última posição e pode ou não estar preenchida
                     int type = linhaScanner.nextInt();
-                    long interval = linhaScanner.nextLong();
-                    float posX = linhaScanner.nextFloat();
-                    float posY = linhaScanner.nextFloat();
-                    int amount = 1;
+                    long interval = currentTime + linhaScanner.nextLong();
+                    String posX = linhaScanner.next();
+                    String posY = linhaScanner.next();
+                    int amount = 10;
                     if(linhaScanner.hasNext())
                         amount = linhaScanner.nextInt();
 
-                    EntityConfig enemy = new EntityConfig(type, interval, posX, posY, amount);
+                    EntityConfig enemy = new EntityConfig(type, interval, Float.parseFloat(posX), Float.parseFloat(posY), amount);
                     enemiesConfig.add(enemy);
                 }
                 if(chave.equals("POWERUP")){    
                     ArrayList<PlayerModifier> modifiersList = new ArrayList<>();
                     
-                    long interval = linhaScanner.nextLong();
-                    float posX = linhaScanner.nextFloat();
-                    float posY = linhaScanner.nextFloat();
+                    long interval = currentTime + linhaScanner.nextLong();
+                    String posX = linhaScanner.next();
+                    String posY = linhaScanner.next();
 
                     // posso nao ter nenhum modifier e posso ter varios, conforme for tendo vc vai adicionando
                     while(linhaScanner.hasNext()){
@@ -289,7 +289,7 @@ public class Scene {
                             modifiersList.add(new DoubleTapModifier());
                     }
     
-                    PowerupConfig pConfig = new PowerupConfig(interval, posX, posY);     
+                    PowerupConfig pConfig = new PowerupConfig(interval, Float.parseFloat(posX), Float.parseFloat(posY));     
                     pConfig.modifiers = modifiersList;
                     powerUpsConfig.add(pConfig);
                 }
