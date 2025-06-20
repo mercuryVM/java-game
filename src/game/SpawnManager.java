@@ -13,6 +13,7 @@ public class SpawnManager {
     private long nextEnemy1 = 0, nextEnemy2 = 0, nextPowerup = 0;
     private long nextRoundTime = -1;
     private int enemy2Count = 0;
+    private int bossCount = 0;
 
     public void OnEnemy2Disposed() {
         enemy2Count--;
@@ -30,6 +31,15 @@ public class SpawnManager {
         }
 
         if(currentTime < nextRoundTime) return;
+
+        //utilizar contagem de inimigos mortos dps
+        if(bossCount == 0){
+            gameManager.SpawnBossA();
+            bossCount++;
+            spawnNewEnemies = false;
+        }
+
+
 
         if(currentTime > nextEnemy1) {
             gameManager.SpawnEnemyA();

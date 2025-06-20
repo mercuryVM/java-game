@@ -6,6 +6,7 @@ import entities.enemies.Enemy;
 import entities.enemies.EnemyA;
 import entities.enemies.EnemyB;
 import entities.enemies.boss.Boss;
+import entities.enemies.boss.BossA;
 import entities.player.Player;
 import entities.powerups.HealthPowerup;
 import entities.powerups.Powerup;
@@ -190,15 +191,16 @@ public class GameManager {
         spawnManager.ResetRound();
     }
 
-    public void SpawnBoss() {
-        var enemy = new Boss(this);
-        enemy.position = new Vector2(GameLib.WIDTH / 2f, GameLib.HEIGHT / 2f);
-        //enemy.velocity = new Vector2(0.42f, 0.42f);
-        enemy.angle = (3f * (float) Math.PI) / 2f;
-        enemy.rotationVelocity = 0.0f;
-        enemy.setActive();
+    public void SpawnBossA() {
+        var boss = new BossA(this, 1000);
+        boss.position = new Vector2((float) (Math.random() * (GameLib.WIDTH - 20.0) + 10.0), 50.0f);
+        //boss.velocity = new Vector2(0.05f, 0.05f);
+        boss.angle = (3f * (float) Math.PI) / 2f;
+        boss.rotationVelocity = 0.0f;
+        boss.setActive();
 
-        enemies.add(enemy);
+        System.out.println("aaa");
+        enemies.add(boss);
     }
 
 
