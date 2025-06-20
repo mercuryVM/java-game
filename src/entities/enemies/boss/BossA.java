@@ -23,13 +23,10 @@ public class BossA extends Boss{
         double radius = getRadius();
 
         if(state == State.ACTIVE) {
-            // Apenas o topo com margem (topMargin)
-            // Apenas a margem superior, igual ao BossB
             float topMargin = 32.0f;
             if(position.y <= topMargin + radius){
                 velocity.y = baseVelocity.y * 1;
             }
-            // Bordas laterais e inferior sem margem (mantido o original)
             if(position.y >= GameLib.HEIGHT - radius){
                 velocity.y = baseVelocity.y * -1;
             }
