@@ -21,6 +21,12 @@ public class SpawnManager {
         this.gameManager = gameManager;
     }
 
+    private boolean spawnNewEnemies = true;
+    private long nextEnemy1 = 0, nextEnemy2 = 0, nextPowerup = 0;
+    private long nextRoundTime = -1;
+    private int enemy2Count = 0;
+    private int bossCount = 0;
+
     public void OnEnemy2Disposed() {
         enemy2Count--;
     }
@@ -61,6 +67,19 @@ public class SpawnManager {
             if(nextEnemy2 != null){
                 if(currentTime > nextEnemy2.getInterval()) {
                     // o inimigo tipo 2 por padrão spawna 10, entao em SceneConfig.xml um inimigo tipo 2 indica 10 spawns desse inimigo
+        //utilizar contagem de inimigos mortos dps
+        if(bossCount == 0){
+            gameManager.SpawnBossA();
+            bossCount++;
+            spawnNewEnemies = false;
+        }
+
+
+
+        if(currentTime > nextEnemy1) {
+            gameManager.SpawnEnemyA();
+            nextEnemy1 = currentTime + 300 + (long)(Math.random() * 200);
+        }
 
                     if(nextEnemy2.getNumberOfEnemiesSpawned() < nextEnemy2.getAmountOfEnemies()) {
                         gameManager.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
