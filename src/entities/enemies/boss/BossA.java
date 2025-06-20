@@ -9,8 +9,6 @@ import java.awt.*;
 
 public class BossA extends Boss{
     protected Vector2 baseVelocity = new Vector2();
-    private double InnerRadius;
-    private final float topMargin = 32.0f;  // Apenas a margem superior, igual ao BossB
 
     public BossA(GameManager manager, int bossHealth){
         super(manager, bossHealth);
@@ -26,6 +24,8 @@ public class BossA extends Boss{
 
         if(state == State.ACTIVE) {
             // Apenas o topo com margem (topMargin)
+            // Apenas a margem superior, igual ao BossB
+            float topMargin = 32.0f;
             if(position.y <= topMargin + radius){
                 velocity.y = baseVelocity.y * 1;
             }
@@ -41,8 +41,8 @@ public class BossA extends Boss{
             }
 
             angle += (float) (rotationVelocity * deltaTime);
-            position.x += (float) (velocity.x * deltaTime);
-            position.y += (float) (velocity.y * deltaTime);
+            position.x += (velocity.x * deltaTime);
+            position.y += (velocity.y * deltaTime);
         }
 
         if(state == State.EXPLODING && isNotDead()) {

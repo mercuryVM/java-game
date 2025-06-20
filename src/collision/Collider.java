@@ -1,7 +1,6 @@
 package collision;
 
 import entities.Entity;
-import entities.enemies.boss.BossB;
 import math.Vector2;
 
 public class Collider {

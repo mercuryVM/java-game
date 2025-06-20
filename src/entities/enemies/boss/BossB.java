@@ -1,18 +1,14 @@
 package entities.enemies.boss;
 
-import entities.Entity;
 import entities.Laser;
 import game.GameManager;
 import libraries.GameLib;
-import math.Vector2;
-import time.Time;
 
 import java.awt.*;
 
 public class BossB extends Boss {
     private final float radius = 40.0f;
     private float angle;
-    private final float rotationSpeed = 0.001f;
     private final float margin;
     private final float topMargin;
     private Laser laser;
@@ -49,6 +45,7 @@ public class BossB extends Boss {
         super.Update(deltaTime, currentTime);
 
         if(state == State.ACTIVE) {
+            float rotationSpeed = 0.001f;
             angle += rotationSpeed * deltaTime;
             angle %= (2f * (float)Math.PI);
 
