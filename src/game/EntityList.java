@@ -1,7 +1,6 @@
 package game;
 
 import entities.Entity;
-import entities.enemies.boss.Boss;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

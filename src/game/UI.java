@@ -9,6 +9,7 @@ public class UI {
     private final GameManager gameManager;
     private final DamageIndicator damageIndicator = new DamageIndicator();
     private boolean isGameOver = false;
+    private boolean isBoss = false;
 
     public UI(GameManager manager) {
         gameManager = manager;
@@ -25,7 +26,14 @@ public class UI {
         GameLib.drawString(10, 80, "Health: " + ((Float)gameManager.getCurrentHealth()).intValue());
         RenderSceneText();
 
+        if(isBoss){
+            GameLib.setColor(Color.RED);
+            GameLib.drawString(GameLib.WIDTH / 2f - 40, 60, "Boss Life: " + gameManager.getCurrentBossHealth());
+            GameLib.drawLine(GameLib.WIDTH/3f, 65, GameLib.WIDTH/3f + (GameLib.WIDTH/3f * (gameManager.getCurrentBossHealth()/ gameManager.getBossHealth())), 65);
+        }
+
         if(isGameOver) {
+            GameLib.setColor(Color.WHITE);
             GameLib.drawString((GameLib.WIDTH / 2f) - 50f, GameLib.HEIGHT / 2f, "FIM DE JOGO :(");
         }
     }
@@ -48,6 +56,10 @@ public class UI {
 
     public void GameOver() {
         isGameOver = true;
+    }
+
+    public void setIsBoss(Boolean status){
+        isBoss = status;
     }
 
     public void RenderUI(float deltaTime, long currentTime) {

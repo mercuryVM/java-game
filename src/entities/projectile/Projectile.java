@@ -4,6 +4,7 @@ import entities.Entity;
 import game.GameManager;
 import math.Vector2;
 
+
 public class Projectile extends Entity {
     // private final Collider collider = new Collider(this);
     public final Entity sender;
