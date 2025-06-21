@@ -1,6 +1,5 @@
 package entities.player.modifiers;
 
-import entities.Entity;
 import entities.player.modifiers.entry.PlayerModifierEntry;
 
 import java.util.ArrayList;

@@ -1,15 +1,12 @@
 package entities.projectile;
 
-import collision.Collider;
 import entities.Entity;
 import game.GameManager;
-import libraries.GameLib;
 import math.Vector2;
 
-import java.awt.*;
 
 public class Projectile extends Entity {
-    private final Collider collider = new Collider(this);
+    // private final Collider collider = new Collider(this);
     public final Entity sender;
 
     public Projectile(GameManager manager, Vector2 position, Vector2 velocity, float radius, Entity sender) {

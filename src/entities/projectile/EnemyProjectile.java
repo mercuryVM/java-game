@@ -1,6 +1,5 @@
 package entities.projectile;
 
-import collision.Collider;
 import entities.Entity;
 import game.GameManager;
 import libraries.GameLib;

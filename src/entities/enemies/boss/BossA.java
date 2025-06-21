@@ -1,6 +1,5 @@
 package entities.enemies.boss;
 
-
 import game.GameManager;
 import libraries.GameLib;
 import math.Vector2;
@@ -10,12 +9,11 @@ import java.awt.*;
 
 public class BossA extends Boss{
     protected Vector2 baseVelocity = new Vector2();
-    private double InnerRadius;
 
     public BossA(GameManager manager, int bossHealth){
         super(manager, bossHealth);
-        this.baseVelocity.x = 0.05f;
-        this.baseVelocity.y = 0.05f;
+        this.baseVelocity.x = 0.35f;
+        this.baseVelocity.y = 0.35f;
 
         this.velocity = this.baseVelocity.copy();
     }
@@ -25,8 +23,8 @@ public class BossA extends Boss{
         double radius = getRadius();
 
         if(state == State.ACTIVE) {
-
-            if(position.y <= 0 + radius){
+            float topMargin = 32.0f;
+            if(position.y <= topMargin + radius){
                 velocity.y = baseVelocity.y * 1;
             }
             if(position.y >= GameLib.HEIGHT - radius){
@@ -35,14 +33,13 @@ public class BossA extends Boss{
             if(position.x <= 0 + radius){
                 velocity.x = baseVelocity.x * 1;
             }
-
             if(position.x >= GameLib.WIDTH - radius){
                 velocity.x = baseVelocity.x * -1;
             }
 
             angle += (float) (rotationVelocity * deltaTime);
-            position.x += (float) (velocity.x * deltaTime);
-            position.y += (float) (velocity.y * deltaTime);
+            position.x += (velocity.x * deltaTime);
+            position.y += (velocity.y * deltaTime);
         }
 
         if(state == State.EXPLODING && isNotDead()) {
@@ -54,8 +51,8 @@ public class BossA extends Boss{
         return Time.getTimeFromStart() / 1000f;
     }
 
-    private double getRadius(){
-        return Math.abs(Math.cos(getTime()) * 20) + 30;
+    public float getRadius(){
+        return (float) Math.abs(Math.cos(getTime()) * 20) + 40;
     }
 
     @Override
@@ -66,8 +63,6 @@ public class BossA extends Boss{
         double radius = getRadius();
 
         GameLib.drawCircle(position.x, position.y, radius);
-        GameLib.setColor(Color.gray);
-        GameLib.drawLine(position.x, position.y, position.x * Math.cos(getTime()), position.y * Math.sin(getTime()));
         return false;
     }
 }

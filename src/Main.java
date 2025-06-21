@@ -5,7 +5,6 @@ import scene.config.GameConfig;
 import time.Time;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
@@ -25,18 +24,14 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			//Carrega configuração do jogo antes de iniciar
-
 			System.out.println("Carregando gameConfig.xml");
 
-			var gameConfig = GameConfig.parseFromXMLFile(
-					new File("gameConfig.xml")
-			);
+			File file = new File("gameConfig.xml");
+			GameConfig gameConfig = new GameConfig(file);
 
 			//Cria GameManager com base na configuração carregada
-			gameManager = new GameManager(
-					gameConfig
-			);
-
+			gameManager = new GameManager(gameConfig);
+			
 			Time.timeStartup = System.currentTimeMillis();
 
 			//Inicializa o GameLoop
