@@ -18,9 +18,11 @@ public class SpawnManager {
     private long nextRoundTime = -1;
     public int enemy2Count = 0;
     private Scene currentScene;
+    private Spawner spawner = null;
 
     public SpawnManager(GameManager gameManager) {
         this.gameManager = gameManager;
+        spawner = new Spawner(gameManager);
     }
 
     public void OnEnemy2Disposed() {
@@ -59,7 +61,7 @@ public class SpawnManager {
         if(this.gameManager.currentGameMode == 0){      // se o gameMode for fase usa os spawns de inimigos de fase
             if(nextEnemy1 != null){
                 if(currentTime > nextEnemy1.getInterval()) {
-                    gameManager.SpawnEnemyA(nextEnemy1.getPositionX(), nextEnemy1.getPositionY());
+                    spawner.SpawnEnemyA(nextEnemy1.getPositionX(), nextEnemy1.getPositionY());
                     this.currentScene.removeRecentlySpawnedEnemy(nextEnemy1);        // tira o inimigo tipo 1 que spawnou da lista
                     nextEnemy1 = this.currentScene.getNextEnemyInterval(1);    // pega o prox inimigo tipo 1
                 }
@@ -70,7 +72,7 @@ public class SpawnManager {
                     // o inimigo tipo 2 por padrão spawna 10, entao em SceneConfig.xml um inimigo tipo 2 indica 10 spawns desse inimigo
 
                     if(nextEnemy2.getNumberOfEnemiesSpawned() < nextEnemy2.getAmountOfEnemies()) {
-                        gameManager.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
+                        spawner.SpawnEnemyB(nextEnemy2.getPositionX(), nextEnemy2.getPositionY());
                         nextEnemy2.updateEnemiesSpawned();
                         nextEnemy2.updateSpawnInterval(currentTime + 120);      // se nao deu 10 inimigos ainda, continua spawnando
                     } else {
@@ -83,10 +85,10 @@ public class SpawnManager {
             if(Boss != null){
                 if(currentTime > Boss.getInterval()){      
                     if(Boss.getType() == 1){
-                        gameManager.SpawnBossA(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
+                        spawner.SpawnBossA(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
                     }
                     if(Boss.getType() == 2){
-                        gameManager.SpawnBossB(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
+                        spawner.SpawnBossB(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
                     }
 
                     this.currentScene.removeRecentlySpawnedEnemy(Boss);
@@ -96,7 +98,7 @@ public class SpawnManager {
 
             if(nextPowerup != null){
                 if(currentTime > nextPowerup.getSpawnInterval()) {
-                    gameManager.SpawnPowerup(nextPowerup);
+                    spawner.SpawnPowerup(nextPowerup);
                     this.currentScene.removeRecentlySpawnedPowerup(nextPowerup);
                     nextPowerup = this.currentScene.getNextPowerupInterval();
                 }
@@ -105,7 +107,7 @@ public class SpawnManager {
 
         if(this.gameManager.currentGameMode == 1){      // se gameMode for infinito usa spawns aleatórios infinitos
             if(currentTime > nextEnemy1Interval) {
-                gameManager.SpawnEnemyA();
+                spawner.SpawnEnemyA();
                 nextEnemy1Interval = currentTime + 300 + (long)(Math.random() * 200);
             }
     
@@ -119,7 +121,7 @@ public class SpawnManager {
                     nextEnemy2Interval = currentTime + 10000;
                 }
     
-                gameManager.SpawnEnemyB();
+                spawner.SpawnEnemyB();
                 enemy2Count++;
             }
 
@@ -127,17 +129,17 @@ public class SpawnManager {
                 Random rand = new Random();
                 int type = rand.nextInt(2) + 1;
                 if(type == 1){
-                    gameManager.SpawnBossA();
+                    spawner.SpawnBossA();
                 }
                 if(type == 2){
-                    gameManager.SpawnBossB();
+                    spawner.SpawnBossB();
                 }
                 spawnNewEnemies = false;
                 nextBossInterval = currentTime + 50000;
             }
 
             if(currentTime > nextPowerupInterval) {
-                gameManager.SpawnPowerup();
+                spawner.SpawnPowerup();
                 nextPowerupInterval = currentTime + 30 * 1000;
             }
         }
