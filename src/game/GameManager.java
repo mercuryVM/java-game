@@ -2,10 +2,8 @@ package game;
 
 import background.Background;
 import entities.Entity;
-import entities.Laser;
 import entities.enemies.Enemy;
 import entities.enemies.boss.Boss;
-import entities.enemies.boss.BossB;
 import entities.player.Player;
 import entities.powerups.Powerup;
 import entities.projectile.Projectile;
@@ -26,7 +24,6 @@ public class GameManager {
     public final UI ui = new UI(this);
     public final EntityList<Enemy> enemies = new EntityList<>();
     public final EntityList<Projectile> projectiles = new EntityList<>();
-    public final EntityList<Laser> lasers = new EntityList<>();
     public final EntityList<Powerup> powerups = new EntityList<>();
     public final List<Background> backgrounds = new ArrayList<>();
     public final SpawnManager spawnManager;
@@ -110,7 +107,6 @@ public class GameManager {
 
         enemies.update(deltaTime, currentTime);
         projectiles.update(deltaTime, currentTime);
-        lasers.update(deltaTime, currentTime);
         powerups.update(deltaTime, currentTime);
 
         spawnManager.Update(deltaTime, currentTime);
@@ -124,7 +120,6 @@ public class GameManager {
 
         player.Render(deltaTime, currentTime);
         projectiles.render(deltaTime, currentTime);
-        lasers.render(deltaTime, currentTime);
         enemies.render(deltaTime, currentTime);
         powerups.render(deltaTime, currentTime);
 
@@ -157,16 +152,6 @@ public class GameManager {
                 p.acquire(player);
 
                 break;
-            }
-        }
-
-        for (var laser : lasers.getEntities()) {
-            if (player.isActive() && player.collider.TestLaserCollision(laser)) {
-                if(player.ApplyDamage(
-                        (float)Math.random() * 50.0f
-                )) {
-                    ui.ApplyDamage();
-                }
             }
         }
 
@@ -225,45 +210,8 @@ public class GameManager {
         }
     }
 
-    public void AddLaser(Vector2 position, float rotationSpeed, float length,
-                         Class<? extends Laser> laserClass, Entity sender) {
-        try {
-            Constructor<? extends Laser> constructor = laserClass.getConstructor(
-                    GameManager.class, Vector2.class, float.class, float.class, Entity.class
-            );
-
-            Laser laser = constructor.newInstance(this, position, rotationSpeed, length, sender);
-            lasers.add(laser);
-
-            // Se for um laser de boss, conecta ao boss
-            if(sender instanceof BossB) {
-                ((BossB)sender).setLaser(laser);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void RemoveEnemy(Enemy enemy) {
         enemies.scheduleRemoval(enemy);
-        if (enemy instanceof Boss) {
-            ui.setIsBoss(false);
-            spawnManager.spawnNewEnemies = true;
-
-            if(this.currentScene != null)
-                this.currentScene.bossDied();
-
-            if (enemy instanceof BossB) {
-                Laser bossLaser = ((BossB) enemy).getLaser();
-                if (bossLaser != null) {
-                    lasers.scheduleRemoval(bossLaser);
-                }
-            }
-        }
-    }
-
-    public void RemoveLaser(Laser laser) {
-        lasers.scheduleRemoval(laser);
     }
 
     public void RemoveProjectile(Projectile projectile) {

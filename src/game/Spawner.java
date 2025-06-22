@@ -2,8 +2,6 @@ package game;
 
 import entities.enemies.EnemyA;
 import entities.enemies.EnemyB;
-import entities.enemies.boss.BossA;
-import entities.enemies.boss.BossB;
 import entities.powerups.HealthPowerup;
 import entities.powerups.Powerup;
 import libraries.GameLib;
@@ -59,54 +57,6 @@ public class Spawner{
         enemy.setActive();
 
         gameManager.enemies.add(enemy);
-    }
-
-    public void SpawnBossA() {
-        var boss = new BossA(gameManager, 25000);
-        boss.position = new Vector2((float) (Math.random() * (GameLib.WIDTH - 20.0) + 10.0), 50.0f);
-        boss.velocity = new Vector2(0.05f, 0.05f);
-        boss.angle = (3f * (float) Math.PI) / 2f;
-        boss.rotationVelocity = 0.0f;
-        boss.setActive();
-        gameManager.enemies.add(boss);
-
-        gameManager.ui.setIsBoss(true);
-    }
-
-    public void SpawnBossA(int health, float posX, float posY) {    // overload pra modo fase com posição inicial e hp predefinidos
-        var boss = new BossA(gameManager, health);
-        boss.position = new Vector2(posX, posY);
-        boss.velocity = new Vector2(0.05f, 0.05f);
-        boss.angle = (3f * (float) Math.PI) / 2f;
-        boss.rotationVelocity = 0.0f;
-        boss.setActive();
-        gameManager.enemies.add(boss);
-
-        gameManager.ui.setIsBoss(true);
-    }
-
-    public void SpawnBossB() {
-        var boss = new BossB(gameManager, 2300);
-        boss.position = new Vector2( 60.0f, 60.0f);
-        boss.velocity = new Vector2(0.05f, 0.05f);
-        boss.angle = (3f * (float) Math.PI) / 2f;
-        boss.rotationVelocity = 0.0f;
-        boss.setActive();
-        gameManager.enemies.add(boss);
-
-        gameManager.ui.setIsBoss(true);
-    }
-
-    public void SpawnBossB(int health, float posX, float posY) {
-        var boss = new BossB(gameManager, health);
-        boss.position = new Vector2(posX, posY);
-        boss.velocity = new Vector2(0.05f, 0.05f);
-        boss.angle = (3f * (float) Math.PI) / 2f;
-        boss.rotationVelocity = 0.0f;
-        boss.setActive();
-        gameManager.enemies.add(boss);
-
-        gameManager.ui.setIsBoss(true);
     }
 
     public void SpawnPowerup() {

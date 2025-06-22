@@ -1,7 +1,5 @@
 package game;
 
-import java.util.Random;
-
 import scene.Scene;
 import scene.config.EntityConfig;
 import scene.config.PowerupConfig;
@@ -11,8 +9,8 @@ public class SpawnManager {
     private final GameManager gameManager;
 
     public boolean spawnNewEnemies = true;
-    private EntityConfig nextEnemy1 = null, nextEnemy2 = null, Boss = null;
-    private long nextEnemy1Interval = 0, nextEnemy2Interval = 0, nextBossInterval = 0;
+    private EntityConfig nextEnemy1 = null, nextEnemy2 = null /*, Boss = null */;
+    private long nextEnemy1Interval = 0, nextEnemy2Interval = 0 /*, nextBossInterval = 0*/;
     private PowerupConfig nextPowerup = null;
     private long nextPowerupInterval = 0;
     private long nextRoundTime = -1;
@@ -38,13 +36,11 @@ public class SpawnManager {
             this.currentScene = gameManager.getCurrentScene();
             nextEnemy1 = currentScene.getNextEnemyInterval(1);
             nextEnemy2 = currentScene.getNextEnemyInterval(2);
-            Boss = currentScene.getBossInterval();
             nextPowerup = currentScene.getNextPowerupInterval();
         }
         else{
             nextEnemy1Interval = Time.time + 1000;
             nextEnemy2Interval = Time.time + 5000;
-            nextBossInterval = Time.time + 50000;
         }
     }
 
@@ -82,20 +78,6 @@ public class SpawnManager {
                 }
             }
 
-            if(Boss != null){
-                if(currentTime > Boss.getInterval()){      
-                    if(Boss.getType() == 1){
-                        spawner.SpawnBossA(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
-                    }
-                    if(Boss.getType() == 2){
-                        spawner.SpawnBossB(Boss.getTotalHealth(), Boss.getPositionX(), Boss.getPositionY());
-                    }
-
-                    this.currentScene.removeRecentlySpawnedEnemy(Boss);
-                    Boss = this.currentScene.getBossInterval();
-                }
-            }
-
             if(nextPowerup != null){
                 if(currentTime > nextPowerup.getSpawnInterval()) {
                     spawner.SpawnPowerup(nextPowerup);
@@ -123,19 +105,6 @@ public class SpawnManager {
     
                 spawner.SpawnEnemyB();
                 enemy2Count++;
-            }
-
-            if(currentTime > nextBossInterval){
-                Random rand = new Random();
-                int type = rand.nextInt(2) + 1;
-                if(type == 1){
-                    spawner.SpawnBossA();
-                }
-                if(type == 2){
-                    spawner.SpawnBossB();
-                }
-                spawnNewEnemies = false;
-                nextBossInterval = currentTime + 50000;
             }
 
             if(currentTime > nextPowerupInterval) {
