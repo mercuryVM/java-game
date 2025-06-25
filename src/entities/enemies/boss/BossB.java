@@ -78,11 +78,6 @@ public class BossB extends Boss {
                 manager.RemoveLaser(laser);
                 laser = null;
             }
-
-            if(isNotDead()) {
-                Respawn();
-                InitializeLaser();
-            }
         }
         else if(state == State.INACTIVE) {
             if(laser != null) {
