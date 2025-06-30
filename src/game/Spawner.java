@@ -62,7 +62,7 @@ public class Spawner{
     }
 
     public void SpawnBossA() {
-        var boss = new BossA(gameManager, 25000);
+        var boss = new BossA(gameManager, 2500);
         boss.position = new Vector2((float) (Math.random() * (GameLib.WIDTH - 20.0) + 10.0), 50.0f);
         boss.velocity = new Vector2(0.05f, 0.05f);
         boss.angle = (3f * (float) Math.PI) / 2f;
